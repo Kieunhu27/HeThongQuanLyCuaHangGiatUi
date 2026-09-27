@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'register_screen.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -204,6 +205,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       height: 52,
                       child: ElevatedButton(
                         onPressed: () {
+                          Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const HomeScreen()),
+  );
+
                           // TODO: Xử lý logic gọi API
                         },
                         style: ElevatedButton.styleFrom(
