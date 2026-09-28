@@ -718,7 +718,7 @@ class _BookingStep2ScreenState extends State<BookingStep2Screen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                     builder: (context) => BookingStep3Screen(),
+                      builder: (context) => BookingStep3Screen(),
                     ),
                   );
                 },

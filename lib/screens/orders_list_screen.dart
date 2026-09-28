@@ -26,7 +26,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
     'Đang giặt sấy',
     'Đang giao',
     'Hoàn tất (8)',
-    'Đã hủy'
+    'Đã hủy',
   ];
 
   void _showToast(String message) {
@@ -39,7 +39,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13),
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontSize: 13,
+                ),
               ),
             ),
           ],
@@ -71,7 +74,11 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                 color: surfaceLow,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: Icon(Icons.local_laundry_service_rounded, color: primaryColor, size: 22),
+              child: Icon(
+                Icons.local_laundry_service_rounded,
+                color: primaryColor,
+                size: 22,
+              ),
             ),
             const SizedBox(width: 10),
             Column(
@@ -253,7 +260,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                   borderRadius: BorderRadius.circular(16),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected ? primaryContainer : surfaceLow,
                       borderRadius: BorderRadius.circular(16),
@@ -261,7 +271,11 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     child: Row(
                       children: [
                         if (index == 0) ...[
-                          Icon(Icons.sync, size: 14, color: isSelected ? Colors.white : outlineColor),
+                          Icon(
+                            Icons.sync,
+                            size: 14,
+                            color: isSelected ? Colors.white : outlineColor,
+                          ),
                           const SizedBox(width: 4),
                         ],
                         Text(
@@ -279,7 +293,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
               );
             },
           ),
-        )
+        ),
       ],
     );
   }
@@ -294,7 +308,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
             color: primaryColor.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 8),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -303,9 +317,15 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
           Container(
             height: 5,
             decoration: BoxDecoration(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
               gradient: LinearGradient(
-                colors: [primaryContainer, const Color(0xFFFD56A7), primaryColor],
+                colors: [
+                  primaryContainer,
+                  const Color(0xFFFD56A7),
+                  primaryColor,
+                ],
               ),
             ),
           ),
@@ -327,7 +347,11 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                             color: surfaceHigh,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Icon(Icons.local_laundry_service_rounded, color: primaryColor, size: 22),
+                          child: Icon(
+                            Icons.local_laundry_service_rounded,
+                            color: primaryColor,
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         Column(
@@ -345,14 +369,22 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                                 ),
                                 const SizedBox(width: 4),
                                 GestureDetector(
-                                  onTap: () => _showToast('Đã chép mã đơn #WS3T-8892'),
-                                  child: Icon(Icons.content_copy, size: 14, color: outlineColor),
+                                  onTap: () =>
+                                      _showToast('Đã chép mã đơn #WS3T-8892'),
+                                  child: Icon(
+                                    Icons.content_copy,
+                                    size: 14,
+                                    color: outlineColor,
+                                  ),
                                 ),
                               ],
                             ),
                             Text(
                               'Hôm nay, 10:24 • Khách: Kiều Như',
-                              style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 11,
+                                color: outlineColor,
+                              ),
                             ),
                           ],
                         ),
@@ -360,7 +392,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     ),
                     // Badge Đang điều phối Shipper
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: surfaceHigh,
                         borderRadius: BorderRadius.circular(20),
@@ -403,10 +438,36 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('1. Đã đặt', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor)),
-                          Text('2. Tới lấy', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor)),
-                          Text('3. Giặt sấy', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor)),
-                          Text('4. Giao nhận', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor)),
+                          Text(
+                            '1. Đã đặt',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                          Text(
+                            '2. Tới lấy',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                          Text(
+                            '3. Giặt sấy',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              color: outlineColor,
+                            ),
+                          ),
+                          Text(
+                            '4. Giao nhận',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              color: outlineColor,
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 6),
@@ -426,10 +487,15 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                               height: 6,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(3),
-                                gradient: LinearGradient(colors: [primaryContainer, const Color(0xFFFD56A7)]),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    primaryContainer,
+                                    const Color(0xFFFD56A7),
+                                  ],
+                                ),
                               ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -438,16 +504,27 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.schedule, size: 14, color: primaryColor),
+                              Icon(
+                                Icons.schedule,
+                                size: 14,
+                                color: primaryColor,
+                              ),
                               const SizedBox(width: 4),
                               RichText(
                                 text: TextSpan(
-                                  style: GoogleFonts.plusJakartaSans(fontSize: 11, color: primaryColor),
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    color: primaryColor,
+                                  ),
                                   children: [
-                                    const TextSpan(text: 'Shipper dự kiến gom: '),
+                                    const TextSpan(
+                                      text: 'Shipper dự kiến gom: ',
+                                    ),
                                     TextSpan(
                                       text: '14:00 – 16:00',
-                                      style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                     const TextSpan(text: ' hôm nay'),
                                   ],
@@ -455,9 +532,15 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                               ),
                             ],
                           ),
-                          Text('Chờ lấy đồ', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor)),
+                          Text(
+                            'Chờ lấy đồ',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              color: outlineColor,
+                            ),
+                          ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -475,11 +558,18 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                         children: [
                           Text(
                             'Giặt Sấy Tinh Tươm (5.0 kg)',
-                            style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.bold, color: onSurface),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: onSurface,
+                            ),
                           ),
                           Text(
                             '+ Ủi hơi nước chống nhăn bảo vệ từng sợi vải cao cấp',
-                            style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              color: outlineColor,
+                            ),
                           ),
                         ],
                       ),
@@ -496,7 +586,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     runSpacing: 6,
                     children: [
                       _buildMiniBadge(Icons.local_florist, 'Hương Hoa Ban Mai'),
-                      _buildMiniBadge(Icons.card_giftcard, 'Túi vải niêm phong chống nước 3T'),
+                      _buildMiniBadge(
+                        Icons.card_giftcard,
+                        'Túi vải niêm phong chống nước 3T',
+                      ),
                     ],
                   ),
                 ),
@@ -512,7 +605,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                       Expanded(
                         child: Text(
                           'Heritage Manor, Căn 302, 128 Hai Bà Trưng, P. Bến Nghé, Q.1',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: outlineColor,
+                          ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -532,13 +628,29 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Đã thanh toán VietQR', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: outlineColor)),
-                        Text('Đã bao gồm 10k Tip • Đã áp 3T Xu', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor.withOpacity(0.8))),
+                        Text(
+                          'Đã thanh toán VietQR',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: outlineColor,
+                          ),
+                        ),
+                        Text(
+                          'Đã bao gồm 10k Tip • Đã áp 3T Xu',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 10,
+                            color: outlineColor.withOpacity(0.8),
+                          ),
+                        ),
                       ],
                     ),
                     Text(
                       '145.000 đ',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
                     ),
                   ],
                 ),
@@ -553,13 +665,18 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryContainer,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
+                      ),
                       elevation: 2,
                     ),
                     icon: const Icon(Icons.sensors, size: 18),
                     label: Text(
                       'Theo dõi tiến độ & Khóa Seal trực tiếp',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -570,14 +687,23 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                       child: SizedBox(
                         height: 38,
                         child: TextButton.icon(
-                          onPressed: () => _showToast('Đang tải hóa đơn VAT điện tử...'),
+                          onPressed: () =>
+                              _showToast('Đang tải hóa đơn VAT điện tử...'),
                           style: TextButton.styleFrom(
                             backgroundColor: surfaceHigh,
                             foregroundColor: primaryColor,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(19),
+                            ),
                           ),
                           icon: const Icon(Icons.receipt_long, size: 16),
-                          label: Text('Xem hóa đơn VAT', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold)),
+                          label: Text(
+                            'Xem hóa đơn VAT',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -590,18 +716,26 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                           style: TextButton.styleFrom(
                             backgroundColor: surfaceHigh,
                             foregroundColor: primaryColor,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(19),
+                            ),
                           ),
                           icon: const Icon(Icons.call, size: 16),
-                          label: Text('Liên hệ Shipper 3T', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold)),
+                          label: Text(
+                            'Liên hệ Shipper 3T',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -619,7 +753,14 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
         children: [
           Icon(icon, size: 12, color: primaryColor),
           const SizedBox(width: 4),
-          Text(text, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: primaryColor, fontWeight: FontWeight.w500)),
+          Text(
+            text,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              color: primaryColor,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -667,18 +808,33 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                         children: [
                           Text(
                             '#$orderCode',
-                            style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: onSurface,
+                            ),
                           ),
                           const SizedBox(width: 4),
                           GestureDetector(
-                            onTap: () => _showToast('Đã sao chép mã đơn #$orderCode'),
-                            child: Icon(Icons.content_copy, size: 12, color: outlineColor),
+                            onTap: () =>
+                                _showToast('Đã sao chép mã đơn #$orderCode'),
+                            child: Icon(
+                              Icons.content_copy,
+                              size: 12,
+                              color: outlineColor,
+                            ),
                           ),
                         ],
                       ),
-                      Text(dateText, style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor)),
+                      Text(
+                        dateText,
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 11,
+                          color: outlineColor,
+                        ),
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
               Container(
@@ -689,9 +845,13 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                 ),
                 child: Text(
                   'Đã giao hoàn tất',
-                  style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 10),
@@ -700,13 +860,30 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(serviceTitle, style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: onSurface)),
+                Text(
+                  serviceTitle,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: onSurface,
+                  ),
+                ),
                 const SizedBox(height: 2),
                 Row(
                   children: [
-                    Icon(Icons.verified_user, size: 13, color: const Color(0xFF006577)),
+                    Icon(
+                      Icons.verified_user,
+                      size: 13,
+                      color: const Color(0xFF006577),
+                    ),
                     const SizedBox(width: 4),
-                    Text(serviceSub, style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor)),
+                    Text(
+                      serviceSub,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: outlineColor,
+                      ),
+                    ),
                   ],
                 ),
               ],
@@ -721,8 +898,21 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(paymentMethod, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor)),
-                  Text(price, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface)),
+                  Text(
+                    paymentMethod,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: outlineColor,
+                    ),
+                  ),
+                  Text(
+                    price,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: onSurface,
+                    ),
+                  ),
                 ],
               ),
               Row(
@@ -731,48 +921,88 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: ElevatedButton.icon(
-                        onPressed: () => _showToast('Đánh giá của bạn: 5 sao Tinh Tươm!'),
+                        onPressed: () =>
+                            _showToast('Đánh giá của bạn: 5 sao Tinh Tươm!'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: surfaceLow,
                           foregroundColor: primaryColor,
                           elevation: 0,
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 6,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                        icon: const Icon(Icons.star, color: Colors.amber, size: 14),
-                        label: Text(ratingText, style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold)),
+                        icon: const Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                          size: 14,
+                        ),
+                        label: Text(
+                          ratingText,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   if (feedbackText != null)
                     Padding(
                       padding: const EdgeInsets.only(right: 6),
                       child: TextButton(
-                        onPressed: () => _showToast('Chuyên viên CSKH sẽ liên hệ lại ngay!'),
+                        onPressed: () =>
+                            _showToast('Chuyên viên CSKH sẽ liên hệ lại ngay!'),
                         style: TextButton.styleFrom(
                           backgroundColor: surfaceLow,
                           foregroundColor: outlineColor,
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
                         ),
-                        child: Text(feedbackText, style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold)),
+                        child: Text(
+                          feedbackText,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ElevatedButton.icon(
-                    onPressed: () => _showToast('Đang thêm lại vào giỏ hàng...'),
+                    onPressed: () =>
+                        _showToast('Đang thêm lại vào giỏ hàng...'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryContainer,
                       foregroundColor: Colors.white,
                       elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                     icon: const Icon(Icons.replay, size: 14),
-                    label: Text('Đặt lại', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold)),
-                  )
+                    label: Text(
+                      'Đặt lại',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ],
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -803,11 +1033,18 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
               children: [
                 Text(
                   'Bảo hiểm vải sợi 100%',
-                  style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: onSurface),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: onSurface,
+                  ),
                 ),
                 Text(
                   'Khóa Seal niêm phong chống tráo đổi • Hotline 24/7: 1900 3388',
-                  style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    color: outlineColor,
+                  ),
                 ),
               ],
             ),
@@ -829,7 +1066,9 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: const DecorationImage(
-          image: NetworkImage('https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=600'),
+          image: NetworkImage(
+            'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=600',
+          ),
           fit: BoxFit.cover,
         ),
       ),
@@ -838,7 +1077,10 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [const Color(0xFF370C14).withOpacity(0.85), Colors.transparent],
+            colors: [
+              const Color(0xFF370C14).withOpacity(0.85),
+              Colors.transparent,
+            ],
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
           ),

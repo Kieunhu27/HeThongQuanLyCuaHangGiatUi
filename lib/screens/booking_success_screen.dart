@@ -42,7 +42,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.close, color: Color(0xFF370C14)),
-          onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+          onPressed: () =>
+              Navigator.of(context).popUntil((route) => route.isFirst),
         ),
         title: Text(
           'Đặt Đơn Thành Công',
@@ -55,7 +56,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.home_outlined, color: Color(0xFF5B4041)),
-            onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+            onPressed: () =>
+                Navigator.of(context).popUntil((route) => route.isFirst),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -70,7 +72,12 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
       body: Stack(
         children: [
           SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 140),
+            padding: const EdgeInsets.only(
+              left: 16,
+              right: 16,
+              top: 8,
+              bottom: 140,
+            ),
             child: Column(
               children: [
                 // 1. HERO SECTION: Checkmark & Lời cảm ơn
@@ -93,7 +100,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.support_agent, size: 18, color: Color(0xFFB90538)),
+                    const Icon(
+                      Icons.support_agent,
+                      size: 18,
+                      color: Color(0xFFB90538),
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'Tổng đài hỗ trợ 3T: ',
@@ -130,7 +141,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     color: Colors.black.withOpacity(0.05),
                     blurRadius: 10,
                     offset: const Offset(0, -4),
-                  )
+                  ),
                 ],
               ),
               child: Column(
@@ -166,7 +177,9 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     width: double.infinity,
                     height: 44,
                     child: TextButton.icon(
-                      onPressed: () => Navigator.of(context).popUntil((route) => route.isFirst),
+                      onPressed: () => Navigator.of(
+                        context,
+                      ).popUntil((route) => route.isFirst),
                       style: TextButton.styleFrom(
                         backgroundColor: const Color(0xFFFFE1E3),
                         foregroundColor: const Color(0xFFB90538),
@@ -187,7 +200,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -211,10 +224,14 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     color: Color(0x40B90538),
                     blurRadius: 16,
                     offset: Offset(0, 4),
-                  )
+                  ),
                 ],
               ),
-              child: const Icon(Icons.check_circle, size: 50, color: Colors.white),
+              child: const Icon(
+                Icons.check_circle,
+                size: 50,
+                color: Colors.white,
+              ),
             ),
             Positioned(
               top: 0,
@@ -222,7 +239,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
               child: CircleAvatar(
                 radius: 12,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.auto_awesome, size: 14, color: const Color(0xFFB90538)),
+                child: Icon(
+                  Icons.auto_awesome,
+                  size: 14,
+                  color: const Color(0xFFB90538),
+                ),
               ),
             ),
           ],
@@ -311,9 +332,14 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
               InkWell(
                 onTap: _copyOrderCode,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: _isCopied ? const Color(0xFFACEDFF) : const Color(0xFFFFE9EA),
+                    color: _isCopied
+                        ? const Color(0xFFACEDFF)
+                        : const Color(0xFFFFE9EA),
                     borderRadius: BorderRadius.circular(15),
                   ),
                   child: Row(
@@ -335,7 +361,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -359,7 +385,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.two_wheeler, color: Color(0xFFB90538), size: 20),
+                  const Icon(
+                    Icons.two_wheeler,
+                    color: Color(0xFFB90538),
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Lịch trình lấy đồ 3T',
@@ -385,7 +415,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     color: const Color(0xFF3E0022),
                   ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -399,14 +429,21 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
               children: [
                 Row(
                   children: [
-             const Icon(Icons.access_time, size: 18, color: Color(0xFFB90538)),
+                    const Icon(
+                      Icons.access_time,
+                      size: 18,
+                      color: Color(0xFFB90538),
+                    ),
                     const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Shipper tới gom đồ:',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFF5B4041)),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF5B4041),
+                          ),
                         ),
                         Text(
                           'Hôm nay (24/10), 14:00 - 16:00',
@@ -417,20 +454,27 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
                 const Divider(height: 16),
                 Row(
                   children: [
-                    const Icon(Icons.event_available, size: 18, color: Color(0xFF006577)),
+                    const Icon(
+                      Icons.event_available,
+                      size: 18,
+                      color: Color(0xFF006577),
+                    ),
                     const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           'Dự kiến giao trả tinh tươm:',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFF5B4041)),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF5B4041),
+                          ),
                         ),
                         Text(
                           'Ngày mai (25/10), trước 11:00',
@@ -441,7 +485,7 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
               ],
@@ -479,7 +523,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     const SizedBox(height: 2),
                     Text(
                       'Căn hộ Heritage Manor, Căn 302, 128 Hai Bà Trưng, P. Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 12, color: const Color(0xFF370C14)),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        color: const Color(0xFF370C14),
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Container(
@@ -490,7 +537,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.chat_bubble, size: 14, color: Color(0xFFB90538)),
+                          const Icon(
+                            Icons.chat_bubble,
+                            size: 14,
+                            color: Color(0xFFB90538),
+                          ),
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
@@ -503,12 +554,12 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                           ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
-              )
+              ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -530,7 +581,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.receipt_long, color: Color(0xFFB90538), size: 20),
+                  const Icon(
+                    Icons.receipt_long,
+                    color: Color(0xFFB90538),
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Chi tiết đơn hàng',
@@ -562,15 +617,36 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                     ),
                   ],
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildItemRow('Giặt Sấy Tinh Tươm (5.0 kg)', '125.000 đ', subtitle: 'Hương Hoa Ban Mai • Khử khuẩn sấy nhiệt'),
-          _buildItemRow('Ủi hơi nước chống nhăn bảo vệ sợi', '+20.000 đ', icon: Icons.iron),
-          _buildItemRow('Túi vải niêm phong chống nước 3T', 'MIỄN PHÍ', isHighlight: true, icon: Icons.inventory_2),
-          _buildItemRow('Bồi dưỡng Shipper 3T', '+10.000 đ', icon: Icons.favorite),
-          _buildItemRow('Ưu đãi (3TTINHTUOM & 3T Xu)', '-25.000 đ', isDiscount: true),
+          _buildItemRow(
+            'Giặt Sấy Tinh Tươm (5.0 kg)',
+            '125.000 đ',
+            subtitle: 'Hương Hoa Ban Mai • Khử khuẩn sấy nhiệt',
+          ),
+          _buildItemRow(
+            'Ủi hơi nước chống nhăn bảo vệ sợi',
+            '+20.000 đ',
+            icon: Icons.iron,
+          ),
+          _buildItemRow(
+            'Túi vải niêm phong chống nước 3T',
+            'MIỄN PHÍ',
+            isHighlight: true,
+            icon: Icons.inventory_2,
+          ),
+          _buildItemRow(
+            'Bồi dưỡng Shipper 3T',
+            '+10.000 đ',
+            icon: Icons.favorite,
+          ),
+          _buildItemRow(
+            'Ưu đãi (3TTINHTUOM & 3T Xu)',
+            '-25.000 đ',
+            isDiscount: true,
+          ),
           const Divider(height: 20),
           Container(
             padding: const EdgeInsets.all(12),
@@ -606,11 +682,18 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                   children: [
                     Row(
                       children: [
-                        const Icon(Icons.account_balance, size: 14, color: Color(0xFF006577)),
+                        const Icon(
+                          Icons.account_balance,
+                          size: 14,
+                          color: Color(0xFF006577),
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'VietQR / Ngân hàng tức thì',
-                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: const Color(0xFF5B4041)),
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: const Color(0xFF5B4041),
+                          ),
                         ),
                       ],
                     ),
@@ -623,16 +706,23 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                       ),
                     ),
                   ],
-                )
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildItemRow(String title, String price, {String? subtitle, IconData? icon, bool isDiscount = false, bool isHighlight = false}) {
+  Widget _buildItemRow(
+    String title,
+    String price, {
+    String? subtitle,
+    IconData? icon,
+    bool isDiscount = false,
+    bool isHighlight = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
@@ -654,7 +744,9 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 12,
                           color: const Color(0xFF370C14),
-                          fontWeight: subtitle != null ? FontWeight.bold : FontWeight.normal,
+                          fontWeight: subtitle != null
+                              ? FontWeight.bold
+                              : FontWeight.normal,
                         ),
                       ),
                     ),
@@ -663,7 +755,10 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                 if (subtitle != null)
                   Text(
                     subtitle,
-                    style: GoogleFonts.plusJakartaSans(fontSize: 10, color: const Color(0xFF5B4041)),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: const Color(0xFF5B4041),
+                    ),
                   ),
               ],
             ),
@@ -676,8 +771,8 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
               color: isDiscount
                   ? const Color(0xFFB90538)
                   : isHighlight
-                      ? const Color(0xFFB90538)
-                      : const Color(0xFF370C14),
+                  ? const Color(0xFFB90538)
+                  : const Color(0xFF370C14),
             ),
           ),
         ],
@@ -701,7 +796,11 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.verified, color: Color(0xFFB4136D), size: 18),
+                  const Icon(
+                    Icons.verified,
+                    color: Color(0xFFB4136D),
+                    size: 18,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     'Cam kết Quy trình 3T',
@@ -720,15 +819,30 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                   fontWeight: FontWeight.bold,
                   color: const Color(0xFFB4136D),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildStepRow('1', 'Bàn giao đồ & Kẹp Seal', 'Trao đồ cho Shipper 3T và xác thực mã Seal chống thất lạc đồ.', const Color(0xFFB90538)),
+          _buildStepRow(
+            '1',
+            'Bàn giao đồ & Kẹp Seal',
+            'Trao đồ cho Shipper 3T và xác thực mã Seal chống thất lạc đồ.',
+            const Color(0xFFB90538),
+          ),
           const SizedBox(height: 8),
-          _buildStepRow('2', 'Kiểm đếm & Cân ký trực tiếp', 'Tiệm phân loại chất liệu, chụp ảnh hiện trạng và cập nhật số ký chuẩn xác.', const Color(0xFFB4136D)),
+          _buildStepRow(
+            '2',
+            'Kiểm đếm & Cân ký trực tiếp',
+            'Tiệm phân loại chất liệu, chụp ảnh hiện trạng và cập nhật số ký chuẩn xác.',
+            const Color(0xFFB4136D),
+          ),
           const SizedBox(height: 8),
-          _buildStepRow('3', 'Giám sát quy trình trên App', 'Xem hình ảnh giặt sấy, camera phân loại và tọa độ Shipper giao hàng.', const Color(0xFF006577)),
+          _buildStepRow(
+            '3',
+            'Giám sát quy trình trên App',
+            'Xem hình ảnh giặt sấy, camera phân loại và tọa độ Shipper giao hàng.',
+            const Color(0xFF006577),
+          ),
         ],
       ),
     );
@@ -771,11 +885,14 @@ class _BookingSuccessScreenState extends State<BookingSuccessScreen> {
                 ),
                 Text(
                   desc,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 10, color: const Color(0xFF5B4041)),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    color: const Color(0xFF5B4041),
+                  ),
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );

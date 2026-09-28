@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'booking_step1_screen.dart';
 import 'orders_list_screen.dart';
 import 'promotions_screen.dart';
+import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -34,15 +36,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // Danh sách các màn hình tương ứng với các tab dưới Bottom Bar
     final List<Widget> screens = [
-      HomeScreenContent(onNavigateToPromotions: _onNavigateToPromotions), // Nội dung Trang chủ
-      const OrdersListScreen(),   // Màn hình Đơn hàng (index 1)
-      const PromotionsScreen(),   // Màn hình Ưu đãi (index 2) - ĐÃ TÍCH HỢP
-      const Center(child: Text('Trang Tài khoản')), // Màn hình Tài khoản (index 3)
+      HomeScreenContent(
+        onNavigateToPromotions: _onNavigateToPromotions,
+      ), // Nội dung Trang chủ
+      const OrdersListScreen(), // Màn hình Đơn hàng (index 1)
+      const PromotionsScreen(), // Màn hình Ưu đãi (index 2) - ĐÃ TÍCH HỢP
+      const Center(
+        child: Text('Trang Tài khoản'),
+      ), // Màn hình Tài khoản (index 3)
     ];
 
     return Scaffold(
       backgroundColor: bgSurface,
-      
+
       // 1. HEADER CỐ ĐỊNH TRÊN CÙNG
       appBar: AppBar(
         backgroundColor: bgSurface.withOpacity(0.95),
@@ -60,7 +66,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 color: primaryColor,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.local_laundry_service, color: Colors.white, size: 20),
+              child: const Icon(
+                Icons.local_laundry_service,
+                color: Colors.white,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 8),
             Column(
@@ -76,11 +86,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 Text(
-                  _selectedIndex == 0 
-                      ? 'Trang Chủ' 
-                      : (_selectedIndex == 1 
-                          ? 'Đơn Hàng' 
-                          : (_selectedIndex == 2 ? 'Ưu Đãi' : 'Tài Khoản')),
+                  _selectedIndex == 0
+                      ? 'Trang Chủ'
+                      : (_selectedIndex == 1
+                            ? 'Đơn Hàng'
+                            : (_selectedIndex == 2 ? 'Ưu Đãi' : 'Tài Khoản')),
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -128,10 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       // 2. NỘI DUNG THAY ĐỔI THEO TAB CHỌN
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: screens,
-      ),
+      body: IndexedStack(index: _selectedIndex, children: screens),
 
       // 3. THANH ĐIỀU HƯỚNG BOTTOM BAR CÓ NÚT "ĐẶT LỊCH" NỔI Ở GIỮA
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -139,11 +146,9 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const BookingStep1Screen(), 
-            ),
+            MaterialPageRoute(builder: (context) => const BookingStep1Screen()),
           );
-        }, 
+        },
         backgroundColor: primaryColor,
         elevation: 6,
         shape: const CircleBorder(),
@@ -298,14 +303,21 @@ class HomeScreenContent extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: surfaceContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.workspace_premium, color: secondaryColor, size: 12),
+                          const Icon(
+                            Icons.workspace_premium,
+                            color: secondaryColor,
+                            size: 12,
+                          ),
                           const SizedBox(width: 4),
                           Text(
                             'Hạng Vàng',
@@ -350,10 +362,18 @@ class HomeScreenContent extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
                 ],
               ),
-              child: const Icon(Icons.notifications_none, color: textColor, size: 22),
+              child: const Icon(
+                Icons.notifications_none,
+                color: textColor,
+                size: 22,
+              ),
             ),
             Positioned(
               top: 10,
@@ -389,7 +409,11 @@ class HomeScreenContent extends StatelessWidget {
             fit: BoxFit.cover,
           ),
           boxShadow: const [
-            BoxShadow(color: Colors.black12, blurRadius: 8, offset: Offset(0, 4)),
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
           ],
         ),
         child: Container(
@@ -412,7 +436,10 @@ class HomeScreenContent extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: primaryColor,
                       borderRadius: BorderRadius.circular(20),
@@ -427,7 +454,10 @@ class HomeScreenContent extends StatelessWidget {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.black38,
                       borderRadius: BorderRadius.circular(12),
@@ -476,7 +506,10 @@ class HomeScreenContent extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: primaryColor,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 8,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -546,7 +579,11 @@ class HomeScreenContent extends StatelessWidget {
                       color: primaryColor,
                     ),
                   ),
-                  const Icon(Icons.chevron_right, size: 16, color: primaryColor),
+                  const Icon(
+                    Icons.chevron_right,
+                    size: 16,
+                    color: primaryColor,
+                  ),
                 ],
               ),
             ),
@@ -559,7 +596,11 @@ class HomeScreenContent extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: const [
-              BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 2)),
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
             ],
           ),
           child: Column(
@@ -570,7 +611,10 @@ class HomeScreenContent extends StatelessWidget {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: surfaceContainer,
                           borderRadius: BorderRadius.circular(20),
@@ -595,14 +639,21 @@ class HomeScreenContent extends StatelessWidget {
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: tertiaryColor.withOpacity(0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.schedule, size: 14, color: tertiaryColor),
+                        const Icon(
+                          Icons.schedule,
+                          size: 14,
+                          color: tertiaryColor,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Hẹn 16:30 hôm nay',
@@ -662,7 +713,9 @@ class HomeScreenContent extends StatelessWidget {
                             value: 0.6,
                             minHeight: 6,
                             backgroundColor: surfaceContainer,
-                            valueColor: AlwaysStoppedAnimation<Color>(primaryColor),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              primaryColor,
+                            ),
                           ),
                         ),
                       ],
@@ -678,7 +731,11 @@ class HomeScreenContent extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.local_shipping_outlined, size: 16, color: secondaryColor),
+                      const Icon(
+                        Icons.local_shipping_outlined,
+                        size: 16,
+                        color: secondaryColor,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Shipper Minh Quân đang phụ trách',
@@ -692,7 +749,10 @@ class HomeScreenContent extends StatelessWidget {
                   InkWell(
                     onTap: () {},
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: surfaceContainer,
                         borderRadius: BorderRadius.circular(16),
@@ -707,7 +767,11 @@ class HomeScreenContent extends StatelessWidget {
                               color: primaryColor,
                             ),
                           ),
-                          const Icon(Icons.arrow_forward, size: 12, color: primaryColor),
+                          const Icon(
+                            Icons.arrow_forward,
+                            size: 12,
+                            color: primaryColor,
+                          ),
                         ],
                       ),
                     ),
@@ -897,9 +961,23 @@ class HomeScreenContent extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _buildPromiseItem(Icons.eco, 'Nước giặt hữu cơ'),
-          Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xFFE3BDBF), shape: BoxShape.circle)),
+          Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE3BDBF),
+              shape: BoxShape.circle,
+            ),
+          ),
           _buildPromiseItem(Icons.verified_user, 'Bảo hiểm vải sợi'),
-          Container(width: 4, height: 4, decoration: const BoxDecoration(color: Color(0xFFE3BDBF), shape: BoxShape.circle)),
+          Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE3BDBF),
+              shape: BoxShape.circle,
+            ),
+          ),
           _buildPromiseItem(Icons.timer, 'Giao hẹn chuẩn giờ'),
         ],
       ),
@@ -932,9 +1010,7 @@ class HomeScreenContent extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => const BookingStep1Screen(),
-            ),
+            MaterialPageRoute(builder: (context) => const BookingStep1Screen()),
           );
         },
         style: ElevatedButton.styleFrom(
@@ -958,7 +1034,11 @@ class HomeScreenContent extends StatelessWidget {
                     color: Colors.white.withOpacity(0.2),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.electric_moped, color: Colors.white, size: 22),
+                  child: const Icon(
+                    Icons.electric_moped,
+                    color: Colors.white,
+                    size: 22,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Column(
@@ -991,7 +1071,11 @@ class HomeScreenContent extends StatelessWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.chevron_right, color: primaryColor, size: 20),
+              child: const Icon(
+                Icons.chevron_right,
+                color: primaryColor,
+                size: 20,
+              ),
             ),
           ],
         ),

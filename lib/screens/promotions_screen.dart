@@ -42,7 +42,10 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             Expanded(
               child: Text(
                 message,
-                style: GoogleFonts.plusJakartaSans(color: Colors.white, fontSize: 13),
+                style: GoogleFonts.plusJakartaSans(
+                  color: Colors.white,
+                  fontSize: 13,
+                ),
               ),
             ),
           ],
@@ -80,7 +83,11 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 color: surfaceLow,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.local_laundry_service, color: primaryColor, size: 20),
+              child: Icon(
+                Icons.local_laundry_service,
+                color: primaryColor,
+                size: 20,
+              ),
             ),
             const SizedBox(width: 8),
             Column(
@@ -187,7 +194,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               subBadge: 'Tự động',
               subBadgeBg: surfaceLow,
               subBadgeTextColor: primaryColor,
-              desc: 'Giảm ngay 20.000đ cho đơn dịch vụ Giặt sấy gấp thơm tho chỉ từ 120.000đ.',
+              desc:
+                  'Giảm ngay 20.000đ cho đơn dịch vụ Giặt sấy gấp thơm tho chỉ từ 120.000đ.',
               code: '3TTINHTUOM',
               expiry: '30/10/2026',
               btnText: 'Dùng ngay',
@@ -208,7 +216,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               subBadge: 'Đặc quyền',
               subBadgeBg: const Color(0xFFACEDFF),
               subBadgeTextColor: const Color(0xFF001F26),
-              desc: 'Miễn phí giao nhận tận sảnh chung cư hoặc nhà riêng (tối đa 30.000đ).',
+              desc:
+                  'Miễn phí giao nhận tận sảnh chung cư hoặc nhà riêng (tối đa 30.000đ).',
               code: 'FREESHIP3T',
               expiry: '05/11/2026',
               btnText: 'Dùng ngay',
@@ -229,7 +238,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               subBadge: 'Hot',
               subBadgeBg: const Color(0xFFFFD9E4),
               subBadgeTextColor: const Color(0xFF8C0053),
-              desc: 'Giặt hấp giày thể thao, phủ nano chống bám bẩn kèm khử khuẩn sâu. Đơn từ 150k.',
+              desc:
+                  'Giặt hấp giày thể thao, phủ nano chống bám bẩn kèm khử khuẩn sâu. Đơn từ 150k.',
               code: 'SNEAKERNEW',
               expiry: '15/11/2026',
               btnText: 'Dùng ngay',
@@ -250,7 +260,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               subBadge: 'Tối đa 50k',
               subBadgeBg: surfaceHigh,
               subBadgeTextColor: onSurface,
-              desc: 'Công nghệ giặt hydrocacbon dịu nhẹ giữ form áo vest, suit và lụa tơ tằm.',
+              desc:
+                  'Công nghệ giặt hydrocacbon dịu nhẹ giữ form áo vest, suit và lụa tơ tằm.',
               code: 'GIATKHOVIP',
               expiry: '20/11/2026',
               btnText: 'Lưu mã',
@@ -294,7 +305,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             color: primaryColor.withOpacity(0.3),
             blurRadius: 16,
             offset: const Offset(0, 8),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -312,7 +323,11 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                       color: Colors.white.withOpacity(0.2),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.stars, color: Colors.white, size: 26),
+                    child: const Icon(
+                      Icons.stars,
+                      color: Colors.white,
+                      size: 26,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Column(
@@ -328,7 +343,10 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                       ),
                       const SizedBox(height: 2),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFFD700),
                           borderRadius: BorderRadius.circular(12),
@@ -336,7 +354,11 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.workspace_premium, color: Color(0xFF370C14), size: 12),
+                            const Icon(
+                              Icons.workspace_premium,
+                              color: Color(0xFF370C14),
+                              size: 12,
+                            ),
                             const SizedBox(width: 2),
                             Text(
                               'Hạng Vàng (Gold)',
@@ -385,7 +407,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ],
@@ -402,21 +424,36 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.price_change, color: Colors.white, size: 14),
+                    const Icon(
+                      Icons.price_change,
+                      color: Colors.white,
+                      size: 14,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '≈ 14.500 đ khấu trừ trực tiếp',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 11, color: Colors.white),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: Colors.white,
+                      ),
                     ),
                   ],
                 ),
                 Row(
                   children: [
-                    const Icon(Icons.schedule, color: Color(0xFFFFB2B7), size: 14),
+                    const Icon(
+                      Icons.schedule,
+                      color: Color(0xFFFFB2B7),
+                      size: 14,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       '250 Xu hết hạn 31/10',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 10, color: const Color(0xFFFFB2B7), fontWeight: FontWeight.w500),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        color: const Color(0xFFFFB2B7),
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -429,11 +466,18 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             children: [
               Text(
                 'Tiến trình lên hạng Kim Cương',
-                style: GoogleFonts.plusJakartaSans(fontSize: 10, color: Colors.white.withOpacity(0.9)),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  color: Colors.white.withOpacity(0.9),
+                ),
               ),
               Text(
                 '1.450 / 2.000 Xu',
-                style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ],
           ),
@@ -458,13 +502,18 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: primaryColor,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(19),
+                      ),
                       elevation: 2,
                     ),
                     icon: const Icon(Icons.redeem, size: 16),
                     label: Text(
                       'Đổi quà / Voucher',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
@@ -474,22 +523,28 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 child: SizedBox(
                   height: 38,
                   child: TextButton.icon(
-                    onPressed: () => _showToast('Đang tải lịch sử tích điểm...'),
+                    onPressed: () =>
+                        _showToast('Đang tải lịch sử tích điểm...'),
                     style: TextButton.styleFrom(
                       backgroundColor: Colors.white.withOpacity(0.2),
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(19)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(19),
+                      ),
                     ),
                     icon: const Icon(Icons.history, size: 16),
                     label: Text(
                       'Lịch sử tích điểm',
-                      style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -506,7 +561,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             color: Colors.black.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -519,7 +574,10 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               textCapitalization: TextCapitalization.characters,
               decoration: InputDecoration(
                 hintText: 'NHẬP MÃ ƯU ĐÃI (VÍ DỤ: 3TTINHTUOM...)',
-                hintStyle: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor),
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  color: outlineColor,
+                ),
                 border: InputBorder.none,
                 isDense: true,
               ),
@@ -539,14 +597,19 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               backgroundColor: primaryColor,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               elevation: 1,
             ),
             child: Text(
               'Áp dụng',
-              style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -567,7 +630,10 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               borderRadius: BorderRadius.circular(16),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? primaryColor : surfaceHigh,
                   borderRadius: BorderRadius.circular(16),
@@ -616,7 +682,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             color: Colors.black.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Row(
@@ -625,7 +691,9 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             width: 90,
             decoration: BoxDecoration(
               color: surfaceLow,
-              borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(16),
+              ),
             ),
             padding: const EdgeInsets.symmetric(vertical: 8),
             child: Column(
@@ -643,24 +711,39 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 const SizedBox(height: 4),
                 Text(
                   discountTag,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 9, color: outlineColor, letterSpacing: 0.5),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 9,
+                    color: outlineColor,
+                    letterSpacing: 0.5,
+                  ),
                 ),
                 Text(
                   discountValue,
-                  style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.bold, color: accentColor),
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: accentColor,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: badgeColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     badgeText,
-                    style: GoogleFonts.plusJakartaSans(fontSize: 8, fontWeight: FontWeight.bold, color: badgeTextColor),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: badgeTextColor,
+                    ),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -684,27 +767,41 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                           Expanded(
                             child: Text(
                               title,
-                              style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: onSurface),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: onSurface,
+                              ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: subBadgeBg,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               subBadge,
-                              style: GoogleFonts.plusJakartaSans(fontSize: 9, fontWeight: FontWeight.bold, color: subBadgeTextColor),
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: subBadgeTextColor,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
                       const SizedBox(height: 2),
                       Text(
                         desc,
-                        style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor),
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          color: outlineColor,
+                        ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -722,42 +819,63 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                               children: [
                                 Text(
                                   code,
-                                  style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold, color: accentColor),
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: accentColor,
+                                  ),
                                 ),
                                 const SizedBox(width: 4),
-                                Icon(Icons.content_copy, size: 12, color: outlineColor),
+                                Icon(
+                                  Icons.content_copy,
+                                  size: 12,
+                                  color: outlineColor,
+                                ),
                               ],
                             ),
                           ),
                           Text(
                             'HSD: $expiry',
-                            style: GoogleFonts.plusJakartaSans(fontSize: 9, color: outlineColor),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 9,
+                              color: outlineColor,
+                            ),
                           ),
                         ],
                       ),
                       SizedBox(
                         height: 28,
                         child: ElevatedButton(
-                          onPressed: () => _showToast('Đã áp dụng mã $code vào giỏ hàng'),
+                          onPressed: () =>
+                              _showToast('Đã áp dụng mã $code vào giỏ hàng'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: isPrimaryBtn ? primaryColor : surfaceHigh,
-                            foregroundColor: isPrimaryBtn ? Colors.white : onSurface,
+                            backgroundColor: isPrimaryBtn
+                                ? primaryColor
+                                : surfaceHigh,
+                            foregroundColor: isPrimaryBtn
+                                ? Colors.white
+                                : onSurface,
                             elevation: 0,
                             padding: const EdgeInsets.symmetric(horizontal: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
                           ),
                           child: Text(
                             btnText,
-                            style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold),
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      )
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -790,14 +908,21 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 children: [
                   Text(
                     'Đổi 3T Xu Nhận Quà Tinh Tươm',
-                    style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.bold, color: onSurface),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: onSurface,
+                    ),
                   ),
                   Text(
                     'Số dư của bạn: 1.450 Xu (dư sức đổi)',
-                    style: GoogleFonts.plusJakartaSans(fontSize: 10, color: outlineColor),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: outlineColor,
+                    ),
                   ),
                 ],
-              )
+              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -805,7 +930,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             children: [
               Expanded(
                 child: _buildRewardCard(
-                  imageUrl: 'https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=400',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1585238342024-78d387f4a707?q=80&w=400',
                   cost: '300 Xu',
                   title: 'Nước xả vải hữu cơ Pháp',
                   desc: 'Nâng cấp hương nước hoa cỏ thơm mát lưu hương 7 ngày.',
@@ -814,7 +940,8 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: _buildRewardCard(
-                  imageUrl: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=400',
+                  imageUrl:
+                      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=400',
                   cost: '500 Xu',
                   title: 'Voucher 20k Giặt Chăn Ga',
                   desc: 'Áp dụng giặt rèm cửa, topper và drap nệm phòng ngủ.',
@@ -827,16 +954,25 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             width: double.infinity,
             height: 36,
             child: TextButton.icon(
-              onPressed: () => _showToast('Đang tải thêm danh sách quà tặng...'),
+              onPressed: () =>
+                  _showToast('Đang tải thêm danh sách quà tặng...'),
               style: TextButton.styleFrom(
                 backgroundColor: surfaceHigh,
                 foregroundColor: primaryColor,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
               ),
-              label: Text('Xem thêm 12 phần quà đổi điểm khác', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold)),
+              label: Text(
+                'Xem thêm 12 phần quà đổi điểm khác',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               icon: const Icon(Icons.chevron_right, size: 16),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -872,29 +1008,43 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 top: 4,
                 right: 4,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryColor,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     cost,
-                    style: GoogleFonts.plusJakartaSans(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 9,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
-              )
+              ),
             ],
           ),
           const SizedBox(height: 6),
           Text(
             title,
-            style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold, color: onSurface),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: onSurface,
+            ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           Text(
             desc,
-            style: GoogleFonts.plusJakartaSans(fontSize: 9, color: outlineColor),
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 9,
+              color: outlineColor,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -908,11 +1058,19 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                 backgroundColor: surfaceHigh,
                 foregroundColor: primaryColor,
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
               ),
-              child: Text('Đổi ngay', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold)),
+              child: Text(
+                'Đổi ngay',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -925,7 +1083,9 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         image: const DecorationImage(
-          image: NetworkImage('https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=600'),
+          image: NetworkImage(
+            'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?q=80&w=600',
+          ),
           fit: BoxFit.cover,
         ),
       ),
@@ -934,7 +1094,10 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [const Color(0xFF512128).withOpacity(0.85), Colors.transparent],
+            colors: [
+              const Color(0xFF512128).withOpacity(0.85),
+              Colors.transparent,
+            ],
             begin: Alignment.bottomLeft,
             end: Alignment.topRight,
           ),
@@ -946,25 +1109,48 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryColor,
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: Text('ĐẠI TIỆC THÁNG 10', style: GoogleFonts.plusJakartaSans(fontSize: 8, fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: Text(
+                    'ĐẠI TIỆC THÁNG 10',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 8,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 6),
-                Text('Áp dụng toàn quốc', style: GoogleFonts.plusJakartaSans(fontSize: 9, color: Colors.white.withOpacity(0.9))),
+                Text(
+                  'Áp dụng toàn quốc',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 9,
+                    color: Colors.white.withOpacity(0.9),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 2),
             Text(
               'Tuần Lễ Tinh Tươm 3T',
-              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
             Text(
               'Tặng túi vải niêm phong kháng nước & kháng khuẩn cho đơn từ 100k.',
-              style: GoogleFonts.plusJakartaSans(fontSize: 10, color: const Color(0xFFFFF0F0)),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 10,
+                color: const Color(0xFFFFF0F0),
+              ),
             ),
           ],
         ),
@@ -983,7 +1169,7 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
             color: Colors.black.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
-          )
+          ),
         ],
       ),
       child: Column(
@@ -995,16 +1181,29 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
               const SizedBox(width: 6),
               Text(
                 'Cam Kết Vải Sợi & Điều Khoản Minh Bạch',
-                style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: onSurface),
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: onSurface,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          _buildRuleItem('Bảo hiểm 100% sợi vải:', 'Đền bù theo quy chuẩn 3T Care nếu xảy ra co rút, phai màu hoặc hư hại form dáng.'),
+          _buildRuleItem(
+            'Bảo hiểm 100% sợi vải:',
+            'Đền bù theo quy chuẩn 3T Care nếu xảy ra co rút, phai màu hoặc hư hại form dáng.',
+          ),
           const SizedBox(height: 6),
-          _buildRuleItem('Chính sách gộp mã:', 'Cho phép áp dụng cùng lúc 01 Mã Freeship và 01 Mã giảm giá dịch vụ trên mỗi hóa đơn.'),
+          _buildRuleItem(
+            'Chính sách gộp mã:',
+            'Cho phép áp dụng cùng lúc 01 Mã Freeship và 01 Mã giảm giá dịch vụ trên mỗi hóa đơn.',
+          ),
           const SizedBox(height: 6),
-          _buildRuleItem('Tích lũy linh hoạt:', 'Mỗi 10.000đ thanh toán tích ngay 10 Xu 3T, xu có giá trị trong vòng 180 ngày.'),
+          _buildRuleItem(
+            'Tích lũy linh hoạt:',
+            'Mỗi 10.000đ thanh toán tích ngay 10 Xu 3T, xu có giá trị trong vòng 180 ngày.',
+          ),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.all(10),
@@ -1022,8 +1221,21 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Cần hỗ trợ về mã voucher?', style: GoogleFonts.plusJakartaSans(fontSize: 9, color: outlineColor)),
-                        Text('Hotline: 1900 3388 (Miễn cước)', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold, color: onSurface)),
+                        Text(
+                          'Cần hỗ trợ về mã voucher?',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 9,
+                            color: outlineColor,
+                          ),
+                        ),
+                        Text(
+                          'Hotline: 1900 3388 (Miễn cước)',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: onSurface,
+                          ),
+                        ),
                       ],
                     ),
                   ],
@@ -1033,15 +1245,26 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                     elevation: 0,
                   ),
-                  child: Text('Gọi ngay', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold)),
-                )
+                  child: Text(
+                    'Gọi ngay',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -1056,9 +1279,18 @@ class _PromotionsScreenState extends State<PromotionsScreen> {
         Expanded(
           child: RichText(
             text: TextSpan(
-              style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor),
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                color: outlineColor,
+              ),
               children: [
-                TextSpan(text: '$boldTitle ', style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF370C14))),
+                TextSpan(
+                  text: '$boldTitle ',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF370C14),
+                  ),
+                ),
                 TextSpan(text: normalText),
               ],
             ),
