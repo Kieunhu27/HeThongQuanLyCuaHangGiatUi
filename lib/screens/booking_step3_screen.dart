@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'booking_success_screen.dart';
+import 'vietqr_payment_screen.dart'; // 🚀 1. Import màn hình thanh toán VietQR
 
 class BookingStep3Screen extends StatefulWidget {
   const BookingStep3Screen({super.key});
@@ -9,7 +10,7 @@ class BookingStep3Screen extends StatefulWidget {
 }
 
 class _BookingStep3ScreenState extends State<BookingStep3Screen> {
-  // Màu sắc chủ đạo theo thiết kế
+  // Màu sắc chủ đạo theo thiết kế WashSmart 3T
   final Color primaryColor = const Color(0xFFB90538);
   final Color primaryLight = const Color(0xFFFFD9DC);
   final Color bgSurface = const Color(0xFFFFF8F7);
@@ -1102,19 +1103,32 @@ class _BookingStep3ScreenState extends State<BookingStep3Screen> {
     );
   }
 
-  // --- HÀM XỬ LÝ CHUYỂN TRANG ---
+  // --- 🚀 HÀM XỬ LÝ ĐIỀU HƯỚNG CHUYỂN TRANG THEO PHƯƠNG THỨC THANH TOÁN ---
   void _handleConfirmOrder() {
     setState(() => isSubmitting = true);
-    Future.delayed(const Duration(seconds: 2), () {
+
+    Future.delayed(const Duration(milliseconds: 1200), () {
       if (mounted) {
         setState(() => isSubmitting = false);
 
-        // Chuyển sang Màn hình Đặt Đơn Thành Công
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => BookingSuccessScreen()),
-          (route) => route.isFirst,
-        );
+        if (selectedPayment == 'vietqr') {
+          // 📲 Chuyển sang màn hình Quét Mã Thanh Toán VietQR Napas 247
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const VietQRPaymentScreen(),
+            ),
+          );
+        } else {
+          // 🛑 Chuyển sang màn hình Đặt Đơn Thành Công (Cho COD, MoMo, Card)
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const BookingSuccessScreen(),
+            ),
+            (route) => route.isFirst,
+          );
+        }
       }
     });
   }

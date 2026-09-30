@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'order_tracking_screen.dart'; // Import màn hình Chi tiết / Theo dõi tiến độ
 
 class OrdersListScreen extends StatefulWidget {
   const OrdersListScreen({super.key});
@@ -18,16 +19,6 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
   final Color surfaceHigh = const Color(0xFFFFE1E3);
   final Color onSurface = const Color(0xFF370C14);
   final Color outlineColor = const Color(0xFF8F6F71);
-
-  int selectedTab = 0;
-  final List<String> tabs = [
-    'Đang xử lý (1)',
-    'Chờ lấy đồ (1)',
-    'Đang giặt sấy',
-    'Đang giao',
-    'Hoàn tất (8)',
-    'Đã hủy',
-  ];
 
   void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -129,8 +120,8 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 1. Ô tìm kiếm & Thanh Tab ngang (Search & Filter Bar)
-            _buildSearchAndTabs(),
+            // 1. Khung Tìm kiếm đơn hàng
+            _buildSearchBarOnly(),
             const SizedBox(height: 16),
 
             // 2. Card Đơn hàng nổi bật vừa đặt (#WS3T-8892)
@@ -211,90 +202,34 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
 
   // --- WIDGET THÀNH PHẦN ---
 
-  Widget _buildSearchAndTabs() {
-    return Column(
-      children: [
-        // Thanh Tìm kiếm
-        Container(
-          height: 44,
-          padding: const EdgeInsets.symmetric(horizontal: 12),
-          decoration: BoxDecoration(
-            color: surfaceLow,
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Row(
-            children: [
-              Icon(Icons.search, color: outlineColor, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Tìm theo mã đơn (#WS3T...), tên dịch vụ...',
-                    hintStyle: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      color: outlineColor.withOpacity(0.7),
-                    ),
-                    border: InputBorder.none,
-                    isDense: true,
-                  ),
+  Widget _buildSearchBarOnly() {
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: surfaceLow,
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.search, color: outlineColor, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Tìm theo mã đơn (#WS3T...), tên dịch vụ...',
+                hintStyle: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  color: outlineColor.withOpacity(0.7),
                 ),
+                border: InputBorder.none,
+                isDense: true,
               ),
-              Icon(Icons.mic, color: outlineColor, size: 18),
-            ],
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-
-        // Danh sách Tabs cuộn ngang
-        SizedBox(
-          height: 32,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: tabs.length,
-            itemBuilder: (context, index) {
-              bool isSelected = selectedTab == index;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8.0),
-                child: InkWell(
-                  onTap: () => setState(() => selectedTab = index),
-                  borderRadius: BorderRadius.circular(16),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 14,
-                      vertical: 6,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected ? primaryContainer : surfaceLow,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Row(
-                      children: [
-                        if (index == 0) ...[
-                          Icon(
-                            Icons.sync,
-                            size: 14,
-                            color: isSelected ? Colors.white : outlineColor,
-                          ),
-                          const SizedBox(width: 4),
-                        ],
-                        Text(
-                          tabs[index],
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected ? Colors.white : outlineColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
+          Icon(Icons.mic, color: outlineColor, size: 18),
+        ],
+      ),
     );
   }
 
@@ -656,12 +591,20 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // Cụm Nút Hành động
+                // Cụm Nút Hành động (ĐÃ TÍCH HỢP CHUYỂN MÀN HÌNH THEO DÕI TIẾN ĐỘ)
                 SizedBox(
                   width: double.infinity,
                   height: 44,
                   child: ElevatedButton.icon(
-                    onPressed: () {},
+                    onPressed: () {
+                      // 🚀 Lệnh chuyển sang màn hình Theo dõi tiến độ giặt sấy trực tiếp
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const OrderTrackingScreen(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryContainer,
                       foregroundColor: Colors.white,

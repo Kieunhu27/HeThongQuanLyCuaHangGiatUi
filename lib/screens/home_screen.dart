@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'booking_step1_screen.dart';
 import 'orders_list_screen.dart';
 import 'promotions_screen.dart';
+import 'profile_screen.dart'; // 🚀 1. Import màn hình Tài khoản (ProfileScreen)
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 
@@ -38,12 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     final List<Widget> screens = [
       HomeScreenContent(
         onNavigateToPromotions: _onNavigateToPromotions,
-      ), // Nội dung Trang chủ
+      ), // Nội dung Trang chủ (index 0)
       const OrdersListScreen(), // Màn hình Đơn hàng (index 1)
-      const PromotionsScreen(), // Màn hình Ưu đãi (index 2) - ĐÃ TÍCH HỢP
-      const Center(
-        child: Text('Trang Tài khoản'),
-      ), // Màn hình Tài khoản (index 3)
+      const PromotionsScreen(), // Màn hình Ưu đãi (index 2)
+      const ProfileScreen(),    // 🚀 2. Màn hình Tài khoản giao diện mới (index 3)
     ];
 
     return Scaffold(
@@ -125,13 +124,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          // Avatar người dùng
-          const Padding(
-            padding: EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 16,
-              backgroundColor: primaryColor,
-              child: Icon(Icons.person, color: Colors.white, size: 18),
+          // Avatar người dùng trên App Bar - Bấm vào sẽ chuyển nhanh sang Tab Tài khoản
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 3;
+                });
+              },
+              child: const CircleAvatar(
+                radius: 16,
+                backgroundColor: primaryColor,
+                child: Icon(Icons.person, color: Colors.white, size: 18),
+              ),
             ),
           ),
         ],
@@ -393,7 +399,7 @@ class HomeScreenContent extends StatelessWidget {
     );
   }
 
-  // Khối 2: Banner Ưu đãi (ĐÃ ĐƯỢC BỌC CHUYỂN HƯỚNG TỚI TAB ƯU ĐÃI)
+  // Khối 2: Banner Ưu đãi
   Widget _buildPromoBanner() {
     return GestureDetector(
       onTap: onNavigateToPromotions,
