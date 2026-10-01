@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'booking_step1_screen.dart';
 import 'orders_list_screen.dart';
 import 'promotions_screen.dart';
-import 'profile_screen.dart'; // 🚀 1. Import màn hình Tài khoản (ProfileScreen)
+import 'profile_screen.dart';
 import '../services/api_service.dart';
 import '../services/auth_service.dart';
 
@@ -33,16 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  // Hàm chuyển sang tab Tài khoản
+  void _onNavigateToProfile() {
+    setState(() {
+      _selectedIndex = 3; // Chuyển sang tab Tài khoản
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Danh sách các màn hình tương ứng với các tab dưới Bottom Bar
     final List<Widget> screens = [
       HomeScreenContent(
         onNavigateToPromotions: _onNavigateToPromotions,
+        onNavigateToProfile: _onNavigateToProfile,
       ), // Nội dung Trang chủ (index 0)
       const OrdersListScreen(), // Màn hình Đơn hàng (index 1)
       const PromotionsScreen(), // Màn hình Ưu đãi (index 2)
-      const ProfileScreen(),    // 🚀 2. Màn hình Tài khoản giao diện mới (index 3)
+      const ProfileScreen(),    // Màn hình Tài khoản (index 3)
     ];
 
     return Scaffold(
@@ -124,7 +132,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(width: 8),
-          // Avatar người dùng trên App Bar - Bấm vào sẽ chuyển nhanh sang Tab Tài khoản
+          // Avatar người dùng trên App Bar - Bấm vào chuyển sang Tab Tài khoản
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: GestureDetector(
@@ -217,8 +225,13 @@ class _HomeScreenState extends State<HomeScreen> {
 // TÁCH PHẦN NỘI DUNG CUỘN CỦA TRANG CHỦ RA THÀNH WIDGET RIÊNG
 class HomeScreenContent extends StatelessWidget {
   final VoidCallback onNavigateToPromotions;
+  final VoidCallback onNavigateToProfile;
 
-  const HomeScreenContent({super.key, required this.onNavigateToPromotions});
+  const HomeScreenContent({
+    super.key,
+    required this.onNavigateToPromotions,
+    required this.onNavigateToProfile,
+  });
 
   static const Color primaryColor = Color(0xFFB90538);
   static const Color secondaryColor = Color(0xFFB4136D);
@@ -240,52 +253,55 @@ class HomeScreenContent extends StatelessWidget {
           const SizedBox(height: 20),
           _buildActiveOrderTracker(),
           const SizedBox(height: 20),
-          _buildServicesGrid(),
+          _buildQuickActionButton(context),
+          const SizedBox(height: 20),
+          _buildServicesGrid(context),
           const SizedBox(height: 16),
           _buildCarePromisesRow(),
-          const SizedBox(height: 20),
-          _buildQuickActionButton(context),
           const SizedBox(height: 80), // Khoảng trống cho Bottom Bar
         ],
       ),
     );
   }
 
-  // Khối 1: Thông tin chào mừng
+  // Khối 1: Thông tin chào mừng (Bấm Avatar KN chuyển sang Trang cá nhân)
   Widget _buildWelcomeSection() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            Stack(
-              clipBehavior: Clip.none,
-              children: [
-                CircleAvatar(
-                  radius: 24,
-                  backgroundColor: surfaceContainer,
-                  child: Text(
-                    'KN',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
+            GestureDetector(
+              onTap: onNavigateToProfile,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: surfaceContainer,
+                    child: Text(
+                      'KN',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  bottom: -2,
-                  right: -2,
-                  child: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: const BoxDecoration(
-                      color: tertiaryColor,
-                      shape: BoxShape.circle,
+                  Positioned(
+                    bottom: -2,
+                    right: -2,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: const BoxDecoration(
+                        color: tertiaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.spa, color: Colors.white, size: 10),
                     ),
-                    child: const Icon(Icons.spa, color: Colors.white, size: 10),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             const SizedBox(width: 12),
             Column(
@@ -399,7 +415,7 @@ class HomeScreenContent extends StatelessWidget {
     );
   }
 
-  // Khối 2: Banner Ưu đãi
+  // Khối 2: Banner Ưu đãi (Cập nhật hình ảnh banner mới)
   Widget _buildPromoBanner() {
     return GestureDetector(
       onTap: onNavigateToPromotions,
@@ -410,7 +426,7 @@ class HomeScreenContent extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           image: const DecorationImage(
             image: NetworkImage(
-              'https://images.unsplash.com/photo-1545173168-9f1947eebb7f?q=80&w=800&auto=format&fit=crop',
+              'https://lh3.googleusercontent.com/aida-public/AB6AXuDwE4neSVetDCdPAsBZxl0ApN5fkzSAxJM9lI9HQovfneabm0qN7egaIxQQw9NZf0NF1NUF1ooKS0dYfNXO0Q426eSSLhmHWeqvrQvNHtoHGfmMhxUdRgVPCMwNe46JFIlBb2AGRAGZk4v1HZctqcT7sIQGf49sWYr7yV3kzaZqBGX-FtzNiTiGDfiRYt7DTlshnzJ6rv3gUyp8BGId-tDTSqPLCRxsUPmz2P8OhjaAtF2ZzWmepD_Qug',
             ),
             fit: BoxFit.cover,
           ),
@@ -791,223 +807,7 @@ class HomeScreenContent extends StatelessWidget {
     );
   }
 
-  // Khối 4: Lưới Dịch vụ giặt ủi
-  Widget _buildServicesGrid() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Dịch vụ giặt ủi tinh tươm',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: textColor,
-              ),
-            ),
-            Text(
-              'Chuẩn 3T Attentive',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 11,
-                color: textVariantColor,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          mainAxisSpacing: 12,
-          crossAxisSpacing: 12,
-          childAspectRatio: 0.95,
-          children: [
-            _buildServiceCard(
-              icon: Icons.local_laundry_service,
-              tag: 'Phổ biến',
-              title: 'Giặt sấy theo kg',
-              subtitle: 'Quần áo hàng ngày, đồ ngủ & khăn tắm',
-              price: 'Từ 15k/kg',
-              accentColor: primaryColor,
-              tagBgColor: surfaceContainer,
-            ),
-            _buildServiceCard(
-              icon: Icons.iron,
-              tag: 'Cao cấp',
-              title: 'Giặt khô / Giặt hấp',
-              subtitle: 'Vest, lụa tơ tằm, áo dài & đầm tiệc',
-              price: 'Từ 45k/món',
-              accentColor: secondaryColor,
-              tagBgColor: surfaceContainer,
-            ),
-            _buildServiceCard(
-              icon: Icons.cleaning_services,
-              tag: 'Khử khuẩn UV',
-              title: 'Vệ sinh giày thể thao',
-              subtitle: 'Sneaker, giày da, khử mùi ion âm',
-              price: 'Từ 60k/đôi',
-              accentColor: tertiaryColor,
-              tagBgColor: tertiaryColor.withOpacity(0.15),
-            ),
-            _buildServiceCard(
-              icon: Icons.bed,
-              tag: 'Tận giường',
-              title: 'Rèm cửa & Chăn ga',
-              subtitle: 'Tháo lắp miễn phí tại nhà, giặt diệt khuẩn',
-              price: 'Từ 35k/kg',
-              accentColor: primaryColor,
-              tagBgColor: surfaceContainer,
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget _buildServiceCard({
-    required IconData icon,
-    required String tag,
-    required String title,
-    required String subtitle,
-    required String price,
-    required Color accentColor,
-    required Color tagBgColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              CircleAvatar(
-                radius: 20,
-                backgroundColor: tagBgColor,
-                child: Icon(icon, color: accentColor, size: 22),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: tagBgColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  tag,
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: accentColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 10,
-                  color: textVariantColor,
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                price,
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: accentColor,
-                ),
-              ),
-              Icon(Icons.add_circle_outline, size: 18, color: accentColor),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Khối 5: Cam kết chất lượng
-  Widget _buildCarePromisesRow() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: BoxDecoration(
-        color: surfaceContainerLow,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildPromiseItem(Icons.eco, 'Nước giặt hữu cơ'),
-          Container(
-            width: 4,
-            height: 4,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE3BDBF),
-              shape: BoxShape.circle,
-            ),
-          ),
-          _buildPromiseItem(Icons.verified_user, 'Bảo hiểm vải sợi'),
-          Container(
-            width: 4,
-            height: 4,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE3BDBF),
-              shape: BoxShape.circle,
-            ),
-          ),
-          _buildPromiseItem(Icons.timer, 'Giao hẹn chuẩn giờ'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPromiseItem(IconData icon, String label) {
-    return Row(
-      children: [
-        Icon(icon, size: 14, color: primaryColor),
-        const SizedBox(width: 4),
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // Khối 6: Nút Đặt Giặt Ngay
+  // Khối 4: Nút Đặt Giặt Ngay
   Widget _buildQuickActionButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -1086,6 +886,240 @@ class HomeScreenContent extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  // Khối 5: Lưới Dịch vụ giặt ủi (Cập nhật 4 hình ảnh minh họa thực tế)
+  Widget _buildServicesGrid(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Dịch vụ giặt ủi tinh tươm',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: textColor,
+              ),
+            ),
+            Text(
+              'Chuẩn 3T Attentive',
+              style: GoogleFonts.plusJakartaSans(
+                fontSize: 11,
+                color: textVariantColor,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          mainAxisSpacing: 12,
+          crossAxisSpacing: 12,
+          childAspectRatio: 0.95,
+          children: [
+            _buildServiceCard(
+              context,
+              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDwE4neSVetDCdPAsBZxl0ApN5fkzSAxJM9lI9HQovfneabm0qN7egaIxQQw9NZf0NF1NUF1ooKS0dYfNXO0Q426eSSLhmHWeqvrQvNHtoHGfmMhxUdRgVPCMwNe46JFIlBb2AGRAGZk4v1HZctqcT7sIQGf49sWYr7yV3kzaZqBGX-FtzNiTiGDfiRYt7DTlshnzJ6rv3gUyp8BGId-tDTSqPLCRxsUPmz2P8OhjaAtF2ZzWmepD_Qug',
+              tag: 'Phổ biến',
+              title: 'Giặt sấy theo kg',
+              subtitle: 'Quần áo hàng ngày, đồ ngủ & khăn tắm',
+              price: 'Từ 15k/kg',
+              accentColor: primaryColor,
+              tagBgColor: surfaceContainer,
+            ),
+            _buildServiceCard(
+              context,
+              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDN5VHgmjvH9sJTMb3ZbwhbF8Jr-dvBUYAOLPPLvrNsGdms4SbmeCWfqyrHm_GoZOy2nZ78FDGnl8vgatt8ADbzIR-hMZxrcF7IEyR3Km1sKsSY-fnGbfTOrLQL906BBO2Sck-P_xToXih-1Icwxkn9MIBneyuRqZFjUkNcgw-m6yfTY6693guL48Rjn1zuhteDBQUKbBuaYa-8PBbcUM1QuvLKPVuUhLr4XriUd1t3Qaz85RgJ8wYLTQ',
+              tag: 'Cao cấp',
+              title: 'Giặt khô / Giặt hấp',
+              subtitle: 'Vest, lụa tơ tằm, áo dài & đầm tiệc',
+              price: 'Từ 45k/món',
+              accentColor: secondaryColor,
+              tagBgColor: surfaceContainer,
+            ),
+            _buildServiceCard(
+              context,
+              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDrpNj8_qYGGhyk9JUNMS5EzFqU456WoREXGbAnz4VJOi3xAjuv0U3E4RlOXPUhS-SyEdXk2yhviSLr_EbuV_1NaR__8vwP8X5xLP-q3lFgBOMHdnvTFZ1i5vB1_vU20RdJLhdtBby0_adOxbCZCv-_DigloWjQcslhvA4flwv0Ehl-GKF18y-q4uNrVjPu3au9n71ZtyZ9rof5nLPMwoo8l_So94qEO-QLimRPWkv0HR2F6EwYnYRasQ',
+              tag: 'Khử khuẩn UV',
+              title: 'Vệ sinh giày thể thao',
+              subtitle: 'Sneaker, giày da, khử mùi ion âm',
+              price: 'Từ 60k/đôi',
+              accentColor: tertiaryColor,
+              tagBgColor: tertiaryColor.withOpacity(0.15),
+            ),
+            _buildServiceCard(
+              context,
+              imageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCURIBGaB13vPLnA7UW_U8t0CWJpYEwWfKGO0GkRozloMUYGK2821Y7GzY3rfsP69vdr7jCaAHm8Sp24mKkdsNoo1DI35WroGefJ3Sh6OM5XScfAaLmDuuZUIxuqmXxYNrrXDWEPG6thJpuIoC1QqvC4dE9KidnjsAnOF1QvSYQtTFR4dapB1mIqr2-DFnS26kA-hRaqHndRM87UviiZ5723M1gzn5uoCX2S-HuUP3MKYaQdUNbIecyJw',
+              tag: 'Tận giường',
+              title: 'Rèm cửa & Chăn ga',
+              subtitle: 'Tháo lắp miễn phí tại nhà, giặt diệt khuẩn',
+              price: 'Từ 35k/kg',
+              accentColor: primaryColor,
+              tagBgColor: surfaceContainer,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildServiceCard(
+    BuildContext context, {
+    required String imageUrl,
+    required String tag,
+    required String title,
+    required String subtitle,
+    required String price,
+    required Color accentColor,
+    required Color tagBgColor,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const BookingStep1Screen()),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: const [
+            BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // 🚀 Sử dụng Image.network thay vì Icon
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    imageUrl,
+                    width: 44,
+                    height: 44,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: tagBgColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    tag,
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: accentColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: textColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 10,
+                    color: textVariantColor,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  price,
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: accentColor,
+                  ),
+                ),
+                Icon(Icons.add_circle_outline, size: 18, color: accentColor),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Khối 6: Cam kết chất lượng
+  Widget _buildCarePromisesRow() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: surfaceContainerLow,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildPromiseItem(Icons.eco, 'Nước giặt hữu cơ'),
+          Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE3BDBF),
+              shape: BoxShape.circle,
+            ),
+          ),
+          _buildPromiseItem(Icons.verified_user, 'Bảo hiểm vải sợi'),
+          Container(
+            width: 4,
+            height: 4,
+            decoration: const BoxDecoration(
+              color: Color(0xFFE3BDBF),
+              shape: BoxShape.circle,
+            ),
+          ),
+          _buildPromiseItem(Icons.timer, 'Giao hẹn chuẩn giờ'),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPromiseItem(IconData icon, String label) {
+    return Row(
+      children: [
+        Icon(icon, size: 14, color: primaryColor),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 10,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+          ),
+        ),
+      ],
     );
   }
 }

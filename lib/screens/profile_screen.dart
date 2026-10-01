@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// 🚀 1. Import thêm màn hình Đăng nhập & AuthService
+import 'login_screen.dart';
+import '../services/auth_service.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -40,6 +44,28 @@ class ProfileScreen extends StatelessWidget {
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  // 🚀 2. Hàm xử lý Đăng xuất hoàn chỉnh
+  Future<void> _handleLogout(BuildContext context) async {
+    // Xóa Token và Role lưu dưới SharedPreferences
+    await AuthService.logout();
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Đã đăng xuất tài khoản thành công!'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+
+      // Điều hướng về Trang đăng nhập và xóa toàn bộ Stack màn hình cũ
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -460,11 +486,8 @@ class ProfileScreen extends StatelessWidget {
           width: double.infinity,
           height: 48,
           child: ElevatedButton.icon(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Đã đăng xuất tài khoản thành công!')),
-              );
-            },
+            // 🚀 Bấm nút Đăng xuất sẽ kích hoạt hàm _handleLogout
+            onPressed: () => _handleLogout(context),
             style: ElevatedButton.styleFrom(
               backgroundColor: surfaceLow,
               foregroundColor: primaryColor,

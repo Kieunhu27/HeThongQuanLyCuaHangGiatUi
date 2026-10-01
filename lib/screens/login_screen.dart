@@ -22,12 +22,11 @@ class _LoginScreenState extends State<LoginScreen> {
   final Color surfaceContainerLow = const Color(0xFFFFF0F0);
   final Color onSurface = const Color(0xFF370C14);
   final Color outlineColor = const Color(0xFF8F6F71);
-
   final TextEditingController _phoneController = TextEditingController();
+
   final TextEditingController _passwordController = TextEditingController();
 
   bool _isLoading = false;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -117,7 +116,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
               // 2. Thẻ Form Đăng Nhập
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(
+                  20,
+                ), // Thu nhỏ padding một chút để tiết kiệm diện tích
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(24),
@@ -244,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ],
                           ),
-                          const SizedBox(width: 20),
+                          const SizedBox(width: 20), // Tạo khoảng cách an toàn
                           Text(
                             'Quên mật khẩu?',
                             style: GoogleFonts.plusJakartaSans(
@@ -283,10 +284,10 @@ class _LoginScreenState extends State<LoginScreen> {
                               )
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Text('Đăng nhập ngay'),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_forward),
                                 ],
                               ),
                       ),
@@ -345,7 +346,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Mạng xã hội
+                    // Mạng xã hội (Đã chia tỉ lệ bằng Expanded tự động co giãn)
                     Row(
                       children: [
                         Expanded(
@@ -444,6 +445,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           const SizedBox(height: 8),
+
+                          // ĐOẠN ĐÃ ĐƯỢC THÊM LỆNH CHUYỂN TRANG
                           InkWell(
                             onTap: () {
                               Navigator.push(
@@ -480,7 +483,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 24),
 
-              // 4. Footer
+              // 4. Footer (Cam kết 3T - Đã bọc FittedBox chống vỡ)
               FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Row(
@@ -535,6 +538,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // Đã bỏ thuộc tính `width` cứng để nút tự co giãn linh hoạt
   Widget _buildSocialButton(IconData icon, String label, Color iconColor) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -575,7 +579,6 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  // HÀM XỬ LÝ ĐĂNG NHẬP HOÀN CHỈNH
   Future<void> _login() async {
     final phone = _phoneController.text.trim();
     final password = _passwordController.text;
@@ -586,6 +589,7 @@ class _LoginScreenState extends State<LoginScreen> {
           content: Text('Vui lòng nhập số điện thoại và mật khẩu.'),
         ),
       );
+
       return;
     }
 
@@ -594,27 +598,36 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // 1. Thử gọi API Backend C# chuẩn
       final data = await ApiService.login(phone: phone, password: password);
+
       final token = data['token'];
 
-      if (token != null) {
-        await AuthService.saveToken(token);
+      if (token == null) {
+        throw Exception('API không trả về token.');
       }
+
+      await AuthService.saveToken(token);
+
+      if (!mounted) return;
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomeScreen()),
+      );
     } catch (e) {
-      // 2. Bắt lỗi khi Backend C# chưa bật (Failed to fetch) -> Tự động bỏ qua lỗi để test giao diện
-      debugPrint('Chưa chạy Backend C#, tự động chuyển sang chế độ Test Giao diện.');
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceFirst('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-
-        // 3. Luôn chuyển vào Trang chủ thành công
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
       }
     }
   }
