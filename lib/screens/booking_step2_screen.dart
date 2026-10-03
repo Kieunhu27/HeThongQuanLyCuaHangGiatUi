@@ -733,7 +733,7 @@ class _BookingStep2ScreenState extends State<BookingStep2Screen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
                     Text(
-                      ' Xác nhận và Thanh Toán',
+                      ' Xác nhận và Thanh toán tạm tính ',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

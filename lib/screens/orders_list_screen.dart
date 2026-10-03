@@ -539,7 +539,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          'Heritage Manor, Căn 302, 128 Hai Bà Trưng, P. Bến Nghé, Q.1',
+                           'Căn hộ Heritage Manor, Căn 302, 128 Hai Bà Trưng, P. Bến Nghé, Quận 1, TP. Hồ Chí Minh',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 11,
                             color: outlineColor,
@@ -564,7 +564,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Đã thanh toán VietQR',
+                          'Thanh Toán tạm tính (1 gói dịch vụ)',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             color: outlineColor,
@@ -580,7 +580,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                       ],
                     ),
                     Text(
-                      '145.000 đ',
+                      '105.000 đ',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -615,7 +615,7 @@ class _OrdersListScreenState extends State<OrdersListScreen> {
                     ),
                     icon: const Icon(Icons.sensors, size: 18),
                     label: Text(
-                      'Theo dõi tiến độ & Khóa Seal trực tiếp',
+                      'Theo dõi tiến độ & Chi tiết đơn hàng',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 13,
                         fontWeight: FontWeight.bold,
