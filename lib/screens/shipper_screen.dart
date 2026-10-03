@@ -27,6 +27,7 @@ class ShipperOrderModel {
   final String timeWindow;
   final String customerNote;
   final String? proofPhotoUrl;
+  final List<Map<String, dynamic>> items; // Danh sách đồ gửi kèm: tên, số lượng, dịch vụ
 
   ShipperOrderModel({
     required this.id,
@@ -44,6 +45,7 @@ class ShipperOrderModel {
     required this.timeWindow,
     required this.customerNote,
     this.proofPhotoUrl,
+    this.items = const [],
   });
 }
 
@@ -69,16 +71,20 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
   static const Color warningColor = Color(0xFFF59E0B);
 
   bool _isOnline = true;
-  int _selectedFilterIndex = 0; // 0: Tất cả, 1: Lấy hàng, 2: Giao hàng, 3: Hoàn thành
+  int _selectedFilterIndex = 0; // 0: Cần lấy, 1: Cần giao, 2: Đã hoàn tất
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
 
   late TabController _tabController;
 
   // Shipper Stats
-  double _todayEarnings = 320000;
-  double _todayCodCollected = 850000;
+  static const double _kpiPerOrder = 30000; // Thưởng KPI mỗi đơn hoàn thành
+  static const double _baseSalary = 10000000; // Lương cứng cố định
+  double _violationFee = 50000; // Phí vi phạm (mock)
   int _todayCompletedCount = 7;
+
+  double get kpiEarnings => _todayCompletedCount * _kpiPerOrder;
+  double get totalIncome => kpiEarnings + _baseSalary - _violationFee;
 
   // Mock data đơn hàng shipper
   final List<ShipperOrderModel> _orders = [
@@ -97,6 +103,11 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       isPaidOnline: false,
       timeWindow: '14:30 - 15:30 Hôm nay',
       customerNote: 'Gọi trước khi đến 10 phút, bấm chuông mã 402.',
+      items: [
+        {'name': 'Áo thun', 'qty': 4, 'service': 'Giặt sấy tinh tươm'},
+        {'name': 'Quần jean', 'qty': 2, 'service': 'Giặt sấy tinh tươm'},
+        {'name': 'Áo sơ mi', 'qty': 3, 'service': 'Ủi hơi nước 3T'},
+      ],
     ),
     ShipperOrderModel(
       id: 'WS3T-8892',
@@ -113,6 +124,10 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       isPaidOnline: true,
       timeWindow: 'Giao trước 16:30',
       customerNote: 'Gửi bảo vệ tòa nhà nếu không nghe máy.',
+      items: [
+        {'name': 'Chăn ga gối', 'qty': 1, 'service': 'Giặt sấy thơm lâu'},
+        {'name': 'Bộ đồ bed sheet', 'qty': 2, 'service': 'Mắc áo niêm phong UV'},
+      ],
     ),
     ShipperOrderModel(
       id: 'WS3T-9055',
@@ -129,6 +144,10 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       isPaidOnline: false,
       timeWindow: '15:00 - 16:00',
       customerNote: 'Cần túi niêm phong riêng cho áo vest.',
+      items: [
+        {'name': 'Bộ Vest nam', 'qty': 2, 'service': 'Giặt khô hấp'},
+        {'name': 'Đầm dạ hội', 'qty': 1, 'service': 'Giặt khô hấp'},
+      ],
     ),
     ShipperOrderModel(
       id: 'WS3T-8740',
@@ -145,6 +164,10 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       isPaidOnline: false,
       timeWindow: 'Đã giao lúc 11:20',
       customerNote: 'Khách đã nhận đủ và ký xác nhận.',
+      items: [
+        {'name': 'Giày Sneaker', 'qty': 2, 'service': 'Vệ sinh chuyên sâu'},
+        {'name': 'Giày Sneaker (Phủ Nano)', 'qty': 2, 'service': 'Phủ Nano chống bẩn'},
+      ],
     ),
   ];
 
@@ -163,10 +186,14 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
 
   List<ShipperOrderModel> get filteredOrders {
     return _orders.where((order) {
-      // Filter by tab
-      if (_selectedFilterIndex == 1 && order.type != OrderType.pickup) return false;
-      if (_selectedFilterIndex == 2 && order.type != OrderType.delivery) return false;
-      if (_selectedFilterIndex == 3 && order.status != ShipperOrderStatus.completed) return false;
+      // Filter by tab (0: Cần lấy, 1: Cần giao, 2: Đã hoàn tất)
+      if (_selectedFilterIndex == 0) {
+        if (order.type != OrderType.pickup || order.status == ShipperOrderStatus.completed) return false;
+      }
+      if (_selectedFilterIndex == 1) {
+        if (order.type != OrderType.delivery || order.status == ShipperOrderStatus.completed) return false;
+      }
+      if (_selectedFilterIndex == 2 && order.status != ShipperOrderStatus.completed) return false;
 
       // Filter by search text
       if (_searchQuery.isNotEmpty) {
@@ -218,10 +245,6 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       order.status = newStatus;
       if (newStatus == ShipperOrderStatus.completed) {
         _todayCompletedCount += 1;
-        _todayEarnings += 25000;
-        if (!order.isPaidOnline && order.codAmount > 0) {
-          _todayCodCollected += order.codAmount;
-        }
       }
     });
 
@@ -271,7 +294,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                 color: primaryColor,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.two_wheeler, color: Colors.white, size: 20),
+              child: const Icon(Icons.local_laundry_service_rounded, color: Colors.white, size: 20),
             ),
             const SizedBox(width: 10),
             Column(
@@ -534,8 +557,8 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       children: [
         Expanded(
           child: _buildStatCard(
-            title: 'Thu nhập hôm nay',
-            value: '${(_todayEarnings / 1000).toStringAsFixed(0)}k đ',
+            title: 'Thu nhập KPI',
+            value: '${(kpiEarnings / 1000).toStringAsFixed(0)}k đ',
             icon: Icons.monetization_on,
             iconBg: const Color(0xFFE0F2FE),
             iconColor: const Color(0xFF0284C7),
@@ -544,8 +567,8 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
         const SizedBox(width: 10),
         Expanded(
           child: _buildStatCard(
-            title: 'Tiền COD giữ hộ',
-            value: '${(_todayCodCollected / 1000).toStringAsFixed(0)}k đ',
+            title: 'Lương cứng',
+            value: '${(_baseSalary / 1000).toStringAsFixed(0)}k đ',
             icon: Icons.payments,
             iconBg: const Color(0xFFFEF3C7),
             iconColor: const Color(0xFFD97706),
@@ -663,7 +686,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
 
   Widget _buildFilterTabs(int pickupCount, int deliveryCount) {
     final filterItems = [
-      {'label': 'Tất cả', 'count': _orders.length},
+      //{'label': 'Tất cả', 'count': _orders.length},
       {'label': 'Cần lấy ($pickupCount)', 'count': pickupCount},
       {'label': 'Cần giao ($deliveryCount)', 'count': deliveryCount},
       {'label': 'Đã hoàn tất', 'count': _todayCompletedCount},
@@ -762,7 +785,10 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
           ),
         ],
       ),
-      child: Column(
+      child: InkWell(
+        onTap: () => _showOrderDetailSheet(order),
+        borderRadius: BorderRadius.circular(20),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Order Header
@@ -1016,6 +1042,83 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                 ],
                 const SizedBox(height: 12),
 
+                // Danh sách đồ gửi kèm (số lượng & dịch vụ)
+                if (order.items.isNotEmpty) ...[
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFDF2F8),
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(color: secondaryColor.withOpacity(0.2)),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.checklist_rounded, size: 14, color: secondaryColor),
+                            const SizedBox(width: 6),
+                            Text(
+                              'ĐỒ GỬI KÈM (${order.items.fold<int>(0, (sum, i) => sum + (i['qty'] as int))} món)',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: secondaryColor,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        ...order.items.take(3).map((item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 4),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: secondaryColor.withOpacity(0.12),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'x${item['qty']}',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: secondaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '${item['name']} • ${item['service']}',
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12,
+                                        color: onSurface,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )),
+                        if (order.items.length > 3)
+                          Text(
+                            '+ ${order.items.length - 3} món khác...',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: outlineColor,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
                 // COD & Payment Bar
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1111,6 +1214,299 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
           ),
         ],
       ),
+      ),
+    );
+  }
+
+  // Bottom sheet chi tiết đơn hàng: đồ gửi kèm (số lượng) & dịch vụ giặt
+  void _showOrderDetailSheet(ShipperOrderModel order) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(20, 16, 12, 16),
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.08),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.receipt_long, color: primaryColor),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Chi tiết đơn #${order.id}',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: onSurface,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Thông tin khách
+                    Row(
+                      children: [
+                        const Icon(Icons.person, size: 18, color: primaryColor),
+                        const SizedBox(width: 8),
+                        Text(
+                          order.customerName,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: onSurface,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          order.customerPhone,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            color: outlineColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Địa chỉ
+                    Text(
+                      order.type == OrderType.pickup ? 'Điểm lấy hàng:' : 'Điểm giao hàng:',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: outlineColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      order.type == OrderType.pickup ? order.pickupAddress : order.deliveryAddress,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Bảng đồ gửi kèm
+                    Row(
+                      children: [
+                        const Icon(Icons.checklist_rounded, size: 18, color: secondaryColor),
+                        const SizedBox(width: 8),
+                        Text(
+                          'ĐỒ GỬI KÈM (${order.items.fold<int>(0, (sum, i) => sum + (i['qty'] as int))} món)',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: secondaryColor,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+
+                    if (order.items.isEmpty)
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: surfaceLow,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Text(
+                          'Chưa có thông tin đồ gửi kèm.',
+                          style: GoogleFonts.plusJakartaSans(fontSize: 12, color: outlineColor),
+                        ),
+                      )
+                    else ...[
+                      // Header bảng
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: secondaryColor.withOpacity(0.1),
+                          borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: Text('TÊN ĐỒ', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Text('DỊCH VỤ GIẶT', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Text('SL', textAlign: TextAlign.right, style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(color: secondaryColor.withOpacity(0.2)),
+                          borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                        ),
+                        child: Column(
+                          children: List.generate(order.items.length, (i) {
+                            final item = order.items[i];
+                            return Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                              decoration: BoxDecoration(
+                                color: i.isEven ? Colors.white : surfaceLow.withOpacity(0.5),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: Text(
+                                      item['name'].toString(),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 4,
+                                    child: Text(
+                                      item['service'].toString(),
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12,
+                                        color: outlineColor,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      alignment: Alignment.centerRight,
+                                      child: Text(
+                                        'x${item['qty']}',
+                                        style: GoogleFonts.plusJakartaSans(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                        ),
+                      ),
+                    ],
+                    const SizedBox(height: 16),
+
+                    // Tổng quan dịch vụ & khối lượng
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: surfaceLow,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildDetailRow(Icons.local_laundry_service, 'Gói dịch vụ:', order.serviceDetails),
+                          const SizedBox(height: 8),
+                          _buildDetailRow(Icons.scale, 'Tổng khối lượng:', '${order.weightKg} kg'),
+                          const SizedBox(height: 8),
+                          _buildDetailRow(Icons.schedule, 'Thời gian:', order.timeWindow),
+                          const SizedBox(height: 8),
+                          _buildDetailRow(
+                            order.isPaidOnline ? Icons.verified_user : Icons.payments,
+                            'Thanh toán:',
+                            order.isPaidOnline ? 'Đã thanh toán Online' : 'COD: ${order.codAmount.toStringAsFixed(0)} đ',
+                          ),
+                          if (order.customerNote.isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            _buildDetailRow(Icons.chat_bubble_outline, 'Ghi chú:', order.customerNote),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            // Nút hành động chính
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _handleOrderMainAction(order);
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _getActionButtonColor(order),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  ),
+                  child: Text(
+                    _getActionButtonText(order),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: outlineColor),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: GoogleFonts.plusJakartaSans(fontSize: 12, color: outlineColor, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(width: 4),
+        Expanded(
+          child: Text(
+            value,
+            style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: onSurface),
+          ),
+        ),
+      ],
     );
   }
 
@@ -1184,7 +1580,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
         case ShipperOrderStatus.available:
           return 'Nhận đơn giao hàng';
         case ShipperOrderStatus.delivering:
-          return 'Xác nhận đã giao & Thu COD';
+          return 'Xác nhận đã giao';
         case ShipperOrderStatus.completed:
           return 'Đã hoàn thành';
         default:
@@ -1596,16 +1992,16 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWalletRow('Thu nhập khả dụng:', '${(_todayEarnings).toStringAsFixed(0)} đ'),
+            _buildWalletRow('Thu nhập KPI:', '${kpiEarnings.toStringAsFixed(0)} đ'),
             const SizedBox(height: 8),
-            _buildWalletRow('Tiền COD đang giữ:', '${(_todayCodCollected).toStringAsFixed(0)} đ'),
+            _buildWalletRow('Lương cứng:', '${_baseSalary.toStringAsFixed(0)} đ'),
             const SizedBox(height: 8),
             _buildWalletRow('Số đơn đã xong:', '$_todayCompletedCount đơn'),
+            const SizedBox(height: 8),
+            _buildWalletRow('Phí vi phạm:', '- ${_violationFee.toStringAsFixed(0)} đ'),
             const Divider(height: 20),
-            Text(
-              '* Tiền COD thu hộ sẽ được nộp về cửa hàng vào cuối ca làm việc.',
-              style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor),
-            ),
+            _buildWalletRow('Tổng thu nhập:', '${totalIncome.toStringAsFixed(0)} đ'),
+            const SizedBox(height: 8)
           ],
         ),
         actions: [
