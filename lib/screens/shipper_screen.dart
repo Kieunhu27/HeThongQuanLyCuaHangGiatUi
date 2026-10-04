@@ -27,7 +27,7 @@ class ShipperOrderModel {
   final String timeWindow;
   final String customerNote;
   final String? proofPhotoUrl;
-  final List<Map<String, dynamic>> items; // Danh sách đồ gửi kèm: tên, số lượng, dịch vụ
+  final List<Map<String, dynamic>> items; // Danh sách đồ gửi kèm: loại đồ, khối lượng (kg), dịch vụ, trạng thái
 
   ShipperOrderModel({
     required this.id,
@@ -104,9 +104,9 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       timeWindow: '14:30 - 15:30 Hôm nay',
       customerNote: 'Gọi trước khi đến 10 phút, bấm chuông mã 402.',
       items: [
-        {'name': 'Áo thun', 'qty': 4, 'service': 'Giặt sấy tinh tươm'},
-        {'name': 'Quần jean', 'qty': 2, 'service': 'Giặt sấy tinh tươm'},
-        {'name': 'Áo sơ mi', 'qty': 3, 'service': 'Ủi hơi nước 3T'},
+        {'type': 'Áo thun', 'kg': 1.4, 'service': 'Giặt sấy tinh tươm', 'status': 'Đã xác nhận'},
+        {'type': 'Quần jean', 'kg': 1.6, 'service': 'Giặt sấy tinh tươm', 'status': 'Đang giặt'},
+        {'type': 'Áo sơ mi', 'kg': 2.2, 'service': 'Ủi hơi nước 3T', 'status': 'Đang sấy'},
       ],
     ),
     ShipperOrderModel(
@@ -125,8 +125,8 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       timeWindow: 'Giao trước 16:30',
       customerNote: 'Gửi bảo vệ tòa nhà nếu không nghe máy.',
       items: [
-        {'name': 'Chăn ga gối', 'qty': 1, 'service': 'Giặt sấy thơm lâu'},
-        {'name': 'Bộ đồ bed sheet', 'qty': 2, 'service': 'Mắc áo niêm phong UV'},
+        {'type': 'Chăn ga gối', 'kg': 2.4, 'service': 'Giặt sấy thơm lâu', 'status': 'Đang giặt'},
+        {'type': 'Bộ drap giường', 'kg': 1.8, 'service': 'Mắc áo niêm phong UV', 'status': 'Hoàn tất'},
       ],
     ),
     ShipperOrderModel(
@@ -145,8 +145,8 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       timeWindow: '15:00 - 16:00',
       customerNote: 'Cần túi niêm phong riêng cho áo vest.',
       items: [
-        {'name': 'Bộ Vest nam', 'qty': 2, 'service': 'Giặt khô hấp'},
-        {'name': 'Đầm dạ hội', 'qty': 1, 'service': 'Giặt khô hấp'},
+        {'type': 'Bộ Vest nam', 'kg': 2.0, 'service': 'Giặt khô hấp', 'status': 'Đã xác nhận'},
+        {'type': 'Đầm dạ hội', 'kg': 1.0, 'service': 'Giặt khô hấp', 'status': 'Đang ủi'},
       ],
     ),
     ShipperOrderModel(
@@ -165,8 +165,8 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
       timeWindow: 'Đã giao lúc 11:20',
       customerNote: 'Khách đã nhận đủ và ký xác nhận.',
       items: [
-        {'name': 'Giày Sneaker', 'qty': 2, 'service': 'Vệ sinh chuyên sâu'},
-        {'name': 'Giày Sneaker (Phủ Nano)', 'qty': 2, 'service': 'Phủ Nano chống bẩn'},
+        {'type': 'Giày Sneaker', 'kg': 0.8, 'service': 'Vệ sinh chuyên sâu', 'status': 'Hoàn tất'},
+        {'type': 'Giày Sneaker (Phủ Nano)', 'kg': 0.7, 'service': 'Phủ Nano chống bẩn', 'status': 'Hoàn tất'},
       ],
     ),
   ];
@@ -1059,7 +1059,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                             const Icon(Icons.checklist_rounded, size: 14, color: secondaryColor),
                             const SizedBox(width: 6),
                             Text(
-                              'ĐỒ GỬI KÈM (${order.items.fold<int>(0, (sum, i) => sum + (i['qty'] as int))} món)',
+                              'ĐỒ GỬI KÈM (${order.items.length} loại - ${order.weightKg} kg)',
                               style: GoogleFonts.plusJakartaSans(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
@@ -1081,7 +1081,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      'x${item['qty']}',
+                                      '${item['kg']} kg',
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 11,
                                         fontWeight: FontWeight.bold,
@@ -1092,7 +1092,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      '${item['name']} • ${item['service']}',
+                                      '${item['type']} • ${item['service']} • ${item['status']}',
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 12,
                                         color: onSurface,
@@ -1319,7 +1319,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                         const Icon(Icons.checklist_rounded, size: 18, color: secondaryColor),
                         const SizedBox(width: 8),
                         Text(
-                          'ĐỒ GỬI KÈM (${order.items.fold<int>(0, (sum, i) => sum + (i['qty'] as int))} món)',
+                          'ĐỒ GỬI KÈM (${order.items.length} loại - ${order.weightKg} kg)',
                           style: GoogleFonts.plusJakartaSans(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -1356,7 +1356,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                           children: [
                             Expanded(
                               flex: 3,
-                              child: Text('TÊN ĐỒ', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
+                              child: Text('LOẠI ĐỒ', style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
                             ),
                             Expanded(
                               flex: 4,
@@ -1364,7 +1364,11 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                             ),
                             Expanded(
                               flex: 1,
-                              child: Text('SL', textAlign: TextAlign.right, style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
+                              child: Text('KG', textAlign: TextAlign.right, style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
+                            ),
+                            Expanded(
+                              flex: 3,
+                              child: Text('TRẠNG THÁI', textAlign: TextAlign.right, style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: secondaryColor)),
                             ),
                           ],
                         ),
@@ -1387,7 +1391,7 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                                   Expanded(
                                     flex: 3,
                                     child: Text(
-                                      item['name'].toString(),
+                                      item['type'].toString(),
                                       style: GoogleFonts.plusJakartaSans(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -1406,16 +1410,36 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
                                     ),
                                   ),
                                   Expanded(
-                                    flex: 1,
+                                    flex: 2,
                                     child: Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                       alignment: Alignment.centerRight,
                                       child: Text(
-                                        'x${item['qty']}',
+                                        '${item['kg']} kg',
                                         style: GoogleFonts.plusJakartaSans(
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold,
                                           color: primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: Container(
+                                      alignment: Alignment.centerRight,
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: _getItemStatusColor(item['status'].toString()).withOpacity(0.12),
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                        child: Text(
+                                          item['status'].toString(),
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: _getItemStatusColor(item['status'].toString()),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -1487,6 +1511,24 @@ class _ShipperScreenState extends State<ShipperScreen> with SingleTickerProvider
         ),
       ),
     );
+  }
+
+  // Màu badge trạng thái của từng loại đồ trong chi tiết đơn
+  Color _getItemStatusColor(String status) {
+    switch (status) {
+      case 'Đã xác nhận':
+        return const Color(0xFF0284C7);
+      case 'Đang giặt':
+        return const Color(0xFFD97706);
+      case 'Đang sấy':
+        return secondaryColor;
+      case 'Đang ủi':
+        return const Color(0xFF7C3AED);
+      case 'Hoàn tất':
+        return successColor;
+      default:
+        return outlineColor;
+    }
   }
 
   Widget _buildDetailRow(IconData icon, String label, String value) {
