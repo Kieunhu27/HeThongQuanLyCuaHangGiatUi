@@ -1,191 +1,162 @@
 import 'package:flutter/material.dart';
-import 'booking_step3_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'booking_step3_screen.dart'; // 🚀 Giữ nguyên luồng chuyển sang Bước 3
 
 class BookingStep2Screen extends StatefulWidget {
   final double totalPrice;
 
-  const BookingStep2Screen({super.key, this.totalPrice = 178000});
+  const BookingStep2Screen({super.key, this.totalPrice = 115000});
 
   @override
   State<BookingStep2Screen> createState() => _BookingStep2ScreenState();
 }
 
 class _BookingStep2ScreenState extends State<BookingStep2Screen> {
-  // Brand Colors (Đồng bộ tone màu Rose Pink)
-  final Color primaryColor = const Color(0xFFB90538);
-  final Color surfaceContainer = const Color(0xFFFFE9EA);
-  final Color surfaceContainerLow = const Color(0xFFFFF0F0);
-  final Color surfaceContainerHighest = const Color(0xFFFFD9DC);
+  // Brand Color Tokens WashSmart 3T
+  static const Color primaryColor = Color(0xFFB90538);
+  static const Color primaryContainer = Color(0xFFDC2C4F);
+  static const Color primaryFixed = Color(0xFFFFDADB);
+  static const Color secondaryColor = Color(0xFFB4136D);
+  static const Color secondaryFixed = Color(0xFFFFD9E4);
+  static const Color tertiaryColor = Color(0xFF006577);
+  static const Color tertiaryFixed = Color(0xFFACEDFF);
+  static const Color bgSurface = Color(0xFFFFF8F7);
+  static const Color cardBg = Colors.white;
+  static const Color surfaceLow = Color(0xFFFFF0F0);
+  static const Color surfaceContainer = Color(0xFFFFE9EA);
+  static const Color surfaceHigh = Color(0xFFFFE1E3);
+  static const Color surfaceVariant = Color(0xFFFFD9DC);
+  static const Color onSurface = Color(0xFF370C14);
+  static const Color onSurfaceVariant = Color(0xFF5B4041);
+  static const Color outlineVariant = Color(0xFFE3BDBF);
 
-  // State Variables
-  int _selectedAddressIndex = 0;
-  bool _sameDeliveryAddress = true;
-  int _selectedDateIndex = 0;
-  int _selectedTimeIndex = 0;
+  // --- STATE QUẢN LÝ ---
+  int shippingFee = 30000; // Phí vận chuyển 2 chiều
+  int selectedDateIndex = 0; // 0: Hôm nay (24/10), 1: Ngày mai (25/10), 2: Thứ Bảy (26/10)
+  int selectedTimeSlot = 1; // 0: Gấp (+15k), 1: 14:00-16:00 (Miễn phí), 2: 17:00-19:00, 3: 19:30-21:00
+  bool isSameDeliveryAddress = true; // Giao trả về cùng địa chỉ lấy
 
-  final TextEditingController _shipperNoteController = TextEditingController();
+  final TextEditingController _pickupNoteController = TextEditingController(
+    text: 'Bấm chuông căn 302 lầu 3 hoặc gửi lễ tân sảnh A',
+  );
 
-  final List<Map<String, String>> _dates = [
-    {'title': 'Hôm nay', 'date': '26/09', 'sub': 'Thứ 7'},
-    {'title': 'Ngày mai', 'date': '27/09', 'sub': 'Chủ nhật'},
-    {'title': 'Thứ 2', 'date': '28/09', 'sub': 'Tháng 9'},
-    {'title': 'Thứ 3', 'date': '29/09', 'sub': 'Tháng 9'},
-  ];
+  // --- TÍNH TỔNG TIỀN ĐỘNG ---
+  int get expressFee => (selectedTimeSlot == 0) ? 15000 : 0;
+  int get calculatedTotal => widget.totalPrice.toInt() + shippingFee + expressFee;
 
-  final List<Map<String, String>> _timeSlots = [
-    {'time': '08:00 - 10:00', 'tag': 'Khung giờ phổ biến'},
-    {'time': '10:00 - 12:00', 'tag': 'Còn 3 lượt nhận'},
-    {'time': '14:00 - 16:00', 'tag': 'Buổi chiều'},
-    {'time': '16:00 - 18:00', 'tag': 'Tan tầm'},
-  ];
+  void _showToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Color(0xFF4CD7F6), size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF512128),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pickupNoteController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8F7),
+      backgroundColor: bgSurface,
+
+      // --- 1. HEADER APP BAR ---
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
+        backgroundColor: bgSurface.withOpacity(0.95),
+        elevation: 0,
+        scrolledUnderElevation: 1,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            size: 20,
-            color: Colors.black87,
-          ),
-          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back, color: onSurface, size: 22),
+          onPressed: () => Navigator.maybePop(context),
         ),
-        title: const Text(
-          'Đặt Lịch Thu Giao Hàng',
-          style: TextStyle(
-            color: Colors.black87,
+        title: Text(
+          'Đặt Dịch Vụ Bước 2',
+          style: GoogleFonts.plusJakartaSans(
             fontSize: 18,
-            fontWeight: FontWeight.bold,
+            fontWeight: FontWeight.w600,
+            color: onSurface,
           ),
         ),
-        actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              '3T Express',
-              style: TextStyle(
-                color: primaryColor,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 16.0),
+            child: CircleAvatar(
+              radius: 16,
+              backgroundColor: primaryColor,
+              child: Icon(Icons.person, color: Colors.white, size: 18),
             ),
           ),
         ],
       ),
-      body: Column(
+
+      // --- NỘI DUNG CHÍNH ---
+      body: Stack(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // 1. Stepper Progress
-                  _buildStepperHeader(),
-                  const SizedBox(height: 20),
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 130),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. STEPPER PROGRESS TRACKER
+                _buildStepperProgressTracker(),
+                const SizedBox(height: 12),
 
-                  // 2. Address Selection Section
-                  _buildSectionTitle(
-                    title: 'Địa chỉ thu & Trả đồ',
-                    icon: Icons.location_on,
-                    trailing: TextButton.icon(
-                      onPressed: () {},
-                      icon: const Icon(Icons.add, size: 16),
-                      label: const Text(
-                        'Thêm mới',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      style: TextButton.styleFrom(
-                        foregroundColor: primaryColor,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _buildAddressCard(
-                    index: 0,
-                    title: 'Nhà riêng',
-                    isDefault: true,
-                    phone: '0935 *** 029',
-                    name: 'Nguyễn Kiều Như',
-                    address:
-                        'Căn hộ Heritage Manor, Căn 302, 128 Hai Bà Trưng, P. Bến Nghé, Quận 1, TP. Hồ Chí Minh',
-                  ),
-                  const SizedBox(height: 10),
-                  _buildAddressCard(
-                    index: 1,
-                    title: 'Trường Đại học HUIT',
-                    isDefault: false,
-                    phone: '0935 *** 029',
-                    name: 'Nguyễn Kiều Như - Phòng Thí nghiệm CNTT',
-                    address:
-                        '140 Lê Trọng Tấn, P. Tây Thạnh, Q. Tân Phú, TP. Hồ Chí Minh',
-                  ),
-                  const SizedBox(height: 10),
-                  _buildSameAddressToggle(),
-                  const SizedBox(height: 24),
+                // 2. STEP 1 QUICK SUMMARY CARD
+                _buildStep1SummaryCard(),
+                const SizedBox(height: 16),
 
-                  // 3. Pickup Date & Time Picker
-                  _buildSectionTitle(
-                    title: 'Giờ Shipper qua lấy đồ',
-                    icon: Icons.local_shipping,
-                    trailing: Row(
-                      children: const [
-                        Icon(Icons.bolt, size: 16, color: Color(0xFF006577)),
-                        Text(
-                          'Lấy đồ trong 30p',
-                          style: TextStyle(
-                            color: Color(0xFF006577),
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildDatePicker(),
-                  const SizedBox(height: 12),
-                  _buildTimeSlotGrid(),
-                  const SizedBox(height: 20),
+                // 3. PICKUP ADDRESS SECTION
+                _buildPickupAddressSection(),
+                const SizedBox(height: 16),
 
-                  // 4. Delivery Estimation Notice
-                  _buildEstimateBanner(),
-                  const SizedBox(height: 16),
+                // 4. PICKUP SCHEDULE SECTION
+                _buildPickupScheduleSection(),
+                const SizedBox(height: 16),
 
-                  // 5. Shipper Notes
-                  _buildShipperNoteInput(),
-                  const SizedBox(
-                    height: 100,
-                  ), // Khoảng trống cuộn tránh che đè button
-                ],
-              ),
+                // 5. DELIVERY METHOD & EXPECTED RETURN TIME
+                _buildDeliveryMethodSection(),
+                const SizedBox(height: 16),
+
+                // 6. SHIPPING FEE TRANSPARENCY
+                _buildShippingFeeSection(),
+              ],
             ),
           ),
 
-          // Sticky Bottom Bar
-          _buildBottomCTA(),
+          // --- 7. STICKY BOTTOM CHECKOUT ACTION BAR ---
+          _buildBottomActionBar(context),
         ],
       ),
     );
   }
 
-  // --- WIDGET HELPER METHODS ---
-
-  Widget _buildStepperHeader() {
+  // --- WIDGET 1: STEPPER PROGRESS TRACKER ---
+  Widget _buildStepperProgressTracker() {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: surfaceContainer,
-        borderRadius: BorderRadius.circular(12),
+        color: surfaceLow,
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
@@ -193,71 +164,136 @@ class _BookingStep2ScreenState extends State<BookingStep2Screen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'BƯỚC 2 / 3',
-                style: TextStyle(
-                  color: primaryColor,
+                'BƯỚC 2 TRÊN 3',
+                style: GoogleFonts.plusJakartaSans(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
+                  color: primaryColor,
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Lịch & Địa chỉ',
-                  style: TextStyle(
-                    color: primaryColor,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                  ),
+              Text(
+                'Lịch hẹn & Địa chỉ',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  color: onSurfaceVariant,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                'Chọn địa chỉ & Hẹn giờ Shipper',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-              ),
-              Icon(Icons.schedule, color: primaryColor, size: 20),
-            ],
-          ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
+
           Row(
             children: [
+              // Step 1 Completed
               Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: const BoxDecoration(
+                        color: primaryColor,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.check, size: 16, color: Colors.white),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Gói giặt',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 6),
+
+              // Divider Line 1
               Expanded(
                 child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+                  height: 3,
+                  color: primaryColor,
+                  margin: const EdgeInsets.only(bottom: 16),
                 ),
               ),
-              const SizedBox(width: 6),
+
+              // Step 2 Active
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: primaryContainer,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: primaryFixed, width: 3),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '2',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Lịch & Vị trí',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Divider Line 2
               Expanded(
                 child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: surfaceContainerHighest,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+                  height: 3,
+                  color: surfaceVariant,
+                  margin: const EdgeInsets.only(bottom: 16),
+                ),
+              ),
+
+              // Step 3 Inactive
+              Expanded(
+                child: Column(
+                  children: [
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: const BoxDecoration(
+                        color: surfaceVariant,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '3',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 12,
+                            color: onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Xác nhận',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        color: onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -267,371 +303,533 @@ class _BookingStep2ScreenState extends State<BookingStep2Screen> {
     );
   }
 
-  Widget _buildSectionTitle({
-    required String title,
-    required IconData icon,
-    Widget? trailing,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: primaryColor, size: 22),
-            const SizedBox(width: 6),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-          ],
-        ),
-        if (trailing != null) trailing,
-      ],
-    );
-  }
-
-  Widget _buildAddressCard({
-    required int index,
-    required String title,
-    required bool isDefault,
-    required String phone,
-    required String name,
-    required String address,
-  }) {
-    bool isSelected = _selectedAddressIndex == index;
-    return InkWell(
-      onTap: () => setState(() => _selectedAddressIndex = index),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? primaryColor : Colors.transparent,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6),
-          ],
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Radio<int>(
-              value: index,
-              groupValue: _selectedAddressIndex,
-              activeColor: primaryColor,
-              onChanged: (val) => setState(() => _selectedAddressIndex = val!),
-            ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            title,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                            ),
-                          ),
-                          if (isDefault) ...[
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 6,
-                                vertical: 1,
-                              ),
-                              decoration: BoxDecoration(
-                                color: primaryColor,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: const Text(
-                                'Mặc định',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                      Text(
-                        phone,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    name,
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    address,
-                    style: const TextStyle(fontSize: 11, color: Colors.black54),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSameAddressToggle() {
+  // --- WIDGET 2: STEP 1 QUICK SUMMARY CARD ---
+  Widget _buildStep1SummaryCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: surfaceContainerLow,
-        borderRadius: BorderRadius.circular(10),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6, offset: const Offset(0, 2)),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children: const [
-              Icon(Icons.sync_alt, size: 18, color: Color(0xFF006577)),
-              SizedBox(width: 8),
-              Text(
-                'Giao lại đồ cùng địa chỉ thu',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: const BoxDecoration(
+                  color: secondaryFixed,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.local_laundry_service, size: 20, color: secondaryColor),
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Gói Giặt Sấy Tinh Tươm',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: onSurface,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: secondaryFixed,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '5.0 kg • 12 món',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF3E0022),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Ủi hơi nước kháng khuẩn • Hương hoa ban mai',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          Checkbox(
-            value: _sameDeliveryAddress,
-            activeColor: primaryColor,
-            onChanged: (val) =>
-                setState(() => _sameDeliveryAddress = val ?? true),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                '${widget.totalPrice.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                ),
+              ),
+              Text(
+                'Đã lưu B1',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 10,
+                  color: tertiaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDatePicker() {
-    return SizedBox(
-      height: 75,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _dates.length,
-        itemBuilder: (context, index) {
-          bool isSelected = _selectedDateIndex == index;
-          var item = _dates[index];
-          return GestureDetector(
-            onTap: () => setState(() => _selectedDateIndex = index),
-            child: Container(
-              width: 85,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: isSelected ? primaryColor : Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSelected ? primaryColor : surfaceContainerHighest,
-                ),
-                boxShadow: [
-                  if (isSelected)
-                    BoxShadow(
-                      color: primaryColor.withOpacity(0.3),
-                      blurRadius: 6,
-                    ),
-                ],
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+  // --- WIDGET 3: PICKUP ADDRESS SECTION ---
+  Widget _buildPickupAddressSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
                 children: [
-                  Text(
-                    item['title']!,
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: isSelected ? Colors.white70 : Colors.grey,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    width: 28,
+                    height: 28,
+                    decoration: const BoxDecoration(
+                      color: primaryFixed,
+                      shape: BoxShape.circle,
                     ),
+                    child: const Icon(Icons.pin_drop, size: 18, color: primaryColor),
                   ),
-                  const SizedBox(height: 2),
+                  const SizedBox(width: 8),
                   Text(
-                    item['date']!,
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: isSelected ? Colors.white : Colors.black87,
+                    'Địa chỉ Shipper tới lấy đồ',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 14,
                       fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    item['sub']!,
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: isSelected ? Colors.white : Colors.grey,
+                      color: onSurface,
                     ),
                   ),
                 ],
               ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildTimeSlotGrid() {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 2.3,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
-      itemCount: _timeSlots.length,
-      itemBuilder: (context, index) {
-        bool isSelected = _selectedTimeIndex == index;
-        var item = _timeSlots[index];
-        return GestureDetector(
-          onTap: () => setState(() => _selectedTimeIndex = index),
-          child: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: isSelected ? primaryColor : Colors.transparent,
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 4),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+              InkWell(
+                onTap: () => _showToast('Chức năng Đổi địa chỉ sắp ra mắt!'),
+                child: Row(
                   children: [
                     Text(
-                      item['time']!,
-                      style: const TextStyle(
+                      'Đổi địa chỉ',
+                      style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
+                        color: primaryColor,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item['tag']!,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: isSelected ? primaryColor : Colors.grey,
+                    const Icon(Icons.chevron_right, size: 16, color: primaryColor),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Active Address Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: surfaceLow,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Kiều Như',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: onSurface,
+                          ),
+                        ),
+                        Text(
+                          ' • 0908 123 456',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            color: onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'MẶC ĐỊNH',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                Icon(
-                  isSelected
-                      ? Icons.check_circle
-                      : Icons.radio_button_unchecked,
-                  color: isSelected ? primaryColor : Colors.grey,
-                  size: 18,
+                const SizedBox(height: 6),
+
+                Text(
+                  'Căn hộ Heritage Manor, Căn 302, 128 Hai Bà Trưng, P. Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    color: onSurface,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 8),
+
+                Row(
+                  children: [
+                    const Icon(Icons.verified, size: 14, color: tertiaryColor),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Địa chỉ đã xác thực vệ tinh 3T Express',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: tertiaryColor,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
           ),
-        );
+          const SizedBox(height: 12),
+
+          // Shipper Note Input
+          Text(
+            'Ghi chú vị trí lấy đồ cho Shipper:',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            decoration: BoxDecoration(
+              color: surfaceContainer,
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _pickupNoteController,
+                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurface),
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: EdgeInsets.symmetric(vertical: 10),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => _showToast('Đang thu âm ghi chú giọng nói...'),
+                  icon: const Icon(Icons.mic, size: 18, color: onSurfaceVariant),
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 4: PICKUP SCHEDULE SECTION ---
+  Widget _buildPickupScheduleSection() {
+    final dateOptions = [
+      'Hôm nay (24/10)',
+      'Ngày mai (25/10)',
+      'Thứ Bảy (26/10)',
+    ];
+
+    final timeSlots = [
+      {
+        'title': 'Gấp trong 30–45 phút',
+        'sub': 'Shipper có mặt ngay tức thì',
+        'badge': 'Siêu tốc',
+        'badgeBg': const Color(0xFFFFDAD6),
+        'badgeText': const Color(0xFF93000A),
+        'price': '+15.000 đ',
+        'isPricePrimary': true,
       },
-    );
-  }
+      {
+        'title': '14:00 – 16:00 (Chiều nay)',
+        'sub': 'Shipper khu vực Bến Nghé đang sẵn sàng',
+        'badge': 'Tối ưu nhất',
+        'badgeBg': tertiaryFixed,
+        'badgeText': const Color(0xFF001F26),
+        'price': 'Miễn phí',
+        'isPricePrimary': false,
+      },
+      {
+        'title': '17:00 – 19:00 (Tối nay)',
+        'sub': 'Lấy đồ sau giờ tan tầm',
+        'price': 'Miễn phí',
+        'isPricePrimary': false,
+      },
+      {
+        'title': '19:30 – 21:00 (Tối muộn)',
+        'sub': 'Thích hợp khi về nhà trễ',
+        'price': 'Miễn phí',
+        'isPricePrimary': false,
+      },
+    ];
 
-  Widget _buildEstimateBanner() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: const Border(
-          left: BorderSide(color: Color(0xFF006577), width: 4),
-        ),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 4),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
         ],
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.info_outline, color: Color(0xFF006577), size: 22),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  'Thời gian dự kiến trả đồ sạch:',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Giặt sấy tiêu chuẩn mất khoảng 24h. Dự kiến trả đồ lúc 10:00 Sáng mai (27/09).',
-                  style: TextStyle(fontSize: 11, color: Colors.black54),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildShipperNoteInput() {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(Icons.directions_bike, color: primaryColor, size: 18),
-              const SizedBox(width: 6),
-              const Text(
-                'Ghi chú cho Shipper thu đồ',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              Container(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                  color: secondaryFixed,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.event, size: 18, color: secondaryColor),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Thời gian Shipper tới lấy',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: onSurface,
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 12),
+
+          // Date selector pills
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: List.generate(dateOptions.length, (index) {
+                final isSelected = selectedDateIndex == index;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: InkWell(
+                    onTap: () => setState(() => selectedDateIndex = index),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryColor : surfaceContainer,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          if (index == 0) ...[
+                            Icon(
+                              Icons.today,
+                              size: 14,
+                              color: isSelected ? Colors.white : onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                          ],
+                          Text(
+                            dateOptions[index],
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 11,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                              color: isSelected ? Colors.white : onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              }),
+            ),
+          ),
+          const SizedBox(height: 12),
+
+          // Time slot list
+          Column(
+            children: List.generate(timeSlots.length, (index) {
+              final slot = timeSlots[index];
+              final isSelected = selectedTimeSlot == index;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: InkWell(
+                  onTap: () => setState(() => selectedTimeSlot = index),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? primaryFixed.withOpacity(0.4) : surfaceLow,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected ? primaryColor : Colors.transparent,
+                        width: isSelected ? 1.5 : 0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            Radio<int>(
+                              value: index,
+                              groupValue: selectedTimeSlot,
+                              activeColor: primaryColor,
+                              onChanged: (val) {
+                                if (val != null) setState(() => selectedTimeSlot = val);
+                              },
+                            ),
+                            const SizedBox(width: 4),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      slot['title'] as String,
+                                      style: GoogleFonts.plusJakartaSans(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: onSurface,
+                                      ),
+                                    ),
+                                    if (slot['badge'] != null) ...[
+                                      const SizedBox(width: 6),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                                        decoration: BoxDecoration(
+                                          color: slot['badgeBg'] as Color,
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        child: Text(
+                                          slot['badge'] as String,
+                                          style: GoogleFonts.plusJakartaSans(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.bold,
+                                            color: slot['badgeText'] as Color,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  slot['sub'] as String,
+                                  style: GoogleFonts.plusJakartaSans(
+                                    fontSize: 10,
+                                    color: onSurfaceVariant,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Text(
+                          slot['price'] as String,
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
+                            color: (slot['isPricePrimary'] == true) ? primaryColor : tertiaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
           const SizedBox(height: 8),
-          TextField(
-            controller: _shipperNoteController,
-            maxLines: 2,
-            style: const TextStyle(fontSize: 12),
-            decoration: InputDecoration(
-              hintText:
-                  'Ví dụ: Gọi trước 10 phút, gửi đồ ở lễ tân chung cư A2...',
-              hintStyle: const TextStyle(color: Colors.grey, fontSize: 11),
-              fillColor: surfaceContainerLow,
-              filled: true,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
-              ),
-              contentPadding: const EdgeInsets.all(10),
+
+          // Safety Guarantee Notice Card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: surfaceHigh,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(Icons.verified_user, size: 18, color: primaryColor),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurface, height: 1.3),
+                      children: [
+                        TextSpan(
+                          text: 'An tâm tuyệt đối: ',
+                          style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold),
+                        ),
+                        const TextSpan(
+                          text: 'Shipper 3T trang bị cân điện tử mini chính xác & túi vải niêm phong mã Seal chống nước trước mặt bạn khi nhận đồ.',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -639,114 +837,277 @@ class _BookingStep2ScreenState extends State<BookingStep2Screen> {
     );
   }
 
-  Widget _buildBottomCTA() {
+  // --- WIDGET 5: DELIVERY METHOD & EXPECTED RETURN TIME ---
+  Widget _buildDeliveryMethodSection() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.12),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
+                decoration: const BoxDecoration(
+                  color: tertiaryFixed,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.local_shipping, size: 18, color: tertiaryColor),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'Giao trả đồ sạch thơm',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Return estimation card
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: surfaceLow,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
               children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: secondaryFixed.withOpacity(0.5),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.timer, size: 22, color: secondaryColor),
+                ),
+                const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Tổng thanh toán tạm tính',
-                      style: TextStyle(fontSize: 11, color: Colors.grey),
+                    Text(
+                      '10:00 – 12:00 Ngày mai (25/10)',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 13,
+                        fontWeight: FontWeight.bold,
+                        color: onSurface,
+                      ),
                     ),
-                    Row(
-                      children: [
-                        Text(
-                          '${widget.totalPrice.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}đ',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: primaryColor,
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        const Text(
-                          '(Freeship 0đ)',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: Color(0xFF006577),
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+                    const SizedBox(height: 2),
+                    Text(
+                      'Chuẩn quy trình 24h giặt sấy & ủi tinh tươm',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w500,
+                        color: tertiaryColor,
+                      ),
                     ),
                   ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: surfaceContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    'Hẹn: ${_timeSlots[_selectedTimeIndex]['time']}',
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BookingStep3Screen(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
-                  ),
-                  elevation: 4,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
-                    Text(
-                      ' Xác nhận và Thanh toán tạm tính ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-                  ],
+          ),
+          const SizedBox(height: 10),
+
+          // Checkbox: Same delivery address
+          Row(
+            children: [
+              SizedBox(
+                width: 24,
+                height: 24,
+                child: Checkbox(
+                  value: isSameDeliveryAddress,
+                  activeColor: primaryColor,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  onChanged: (val) => setState(() => isSameDeliveryAddress = val ?? true),
                 ),
               ),
+              const SizedBox(width: 8),
+              Text(
+                'Giao trả về cùng địa chỉ lấy đồ',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  color: onSurface,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 6: SHIPPING FEE TRANSPARENCY ---
+  Widget _buildShippingFeeSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: const BoxDecoration(
+                  color: tertiaryFixed,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.two_wheeler, size: 20, color: tertiaryColor),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Phí vận chuyển 2 chiều',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Lấy & Giao trả tận nơi',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Text(
+            '30.000 đ',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: primaryColor,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 7: STICKY BOTTOM CHECKOUT ACTION BAR (GIỮ NGUYÊN LUỒNG BƯỚC 3) ---
+  Widget _buildBottomActionBar(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20),
+        decoration: BoxDecoration(
+          color: cardBg.withOpacity(0.98),
+          boxShadow: [
+            BoxShadow(color: primaryColor.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, -4)),
           ],
+          border: const Border(top: BorderSide(color: surfaceContainer)),
+        ),
+        child: SafeArea(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Tạm tính (${(widget.totalPrice / 1000).toInt()}k + ship 30k${expressFee > 0 ? ' + gấp 15k' : ''})',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        '${calculatedTotal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        'đ',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              // 🚀 NÚT BẤM BƯỚC 3: GIỮ NGUYÊN LUỒNG BẤM QUA BookingStep3Screen
+              SizedBox(
+                width: 180,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BookingStep3Screen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    elevation: 4,
+                    shadowColor: primaryColor.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Tiếp tục: Bước 3/3',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(Icons.arrow_forward, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

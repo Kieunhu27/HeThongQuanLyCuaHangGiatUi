@@ -1,0 +1,2 @@
+C:/Users/KIEU NHU/HeThongQuanLyCuaHangGiatUi/smartwash/build/.cxx/debug/6n186t4t/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/KIEU NHU/HeThongQuanLyCuaHangGiatUi/smartwash/build/.cxx/debug/6n186t4t/x86_64/CMakeFiles/rebuild_cache.dir

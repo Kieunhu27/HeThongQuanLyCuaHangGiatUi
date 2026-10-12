@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'booking_step2_screen.dart'; // 🚀 Chuyển bước 2 theo code cũ của Như
+import 'booking_step2_screen.dart'; // 🚀 Import chuyển sang Bước 2
 
 class BookingStep1Screen extends StatefulWidget {
   const BookingStep1Screen({super.key});
@@ -10,230 +10,259 @@ class BookingStep1Screen extends StatefulWidget {
 }
 
 class _BookingStep1ScreenState extends State<BookingStep1Screen> {
-  // --- BẢNG MÀU CHUẨN BRAND TOKENS WASHSMART 3T ---
-  static const Color primaryColor = Color(0xFFF43F5E);
+  // Brand Color Tokens WashSmart 3T
+  static const Color primaryColor = Color(0xFFB90538);
   static const Color primaryContainer = Color(0xFFDC2C4F);
+  static const Color primaryFixed = Color(0xFFFFDADB);
   static const Color secondaryColor = Color(0xFFB4136D);
+  static const Color secondaryFixed = Color(0xFFFFD9E4);
+  static const Color tertiaryColor = Color(0xFF006577);
   static const Color bgSurface = Color(0xFFFFF8F7);
   static const Color cardBg = Colors.white;
   static const Color surfaceLow = Color(0xFFFFF0F0);
   static const Color surfaceContainer = Color(0xFFFFE9EA);
   static const Color surfaceHigh = Color(0xFFFFE1E3);
+  static const Color surfaceVariant = Color(0xFFFFD9DC);
   static const Color onSurface = Color(0xFF370C14);
-  static const Color outlineColor = Color(0xFF8F6F71);
+  static const Color onSurfaceVariant = Color(0xFF5B4041);
   static const Color outlineVariant = Color(0xFFE3BDBF);
 
-  // --- QUẢN LÝ TRẠNG THÁI CHỌN ĐƠN HÀNG ---
-  int selectedService = 1; // 1: Giặt sấy tinh tươm, 2: Giặt hấp cao cấp
-  int selectedWeightIndex = 1; // 0: 3.0kg, 1: 5.0kg, 2: 8.0kg, 3: Chưa rõ kg
+  // --- STATE DỮ LIỆU ĐẶT DỊCH VỤ ---
+  double weight = 5.0; // Khối lượng ước tính (kg)
+  final int pricePerKg = 19000; // Đơn giá giặt sấy / kg
+  final int ironPrice = 20000; // Phí dịch vụ ủi hơi nước
+
+  // Số lượng trang phục
+  int shirtsCount = 5; // Áo sơ mi & Áo thun
+  int pantsCount = 3;  // Quần tây & Quần jean
+  int dressesCount = 2; // Đầm công sở / Váy lụa
+  int towelsCount = 2; // Khăn tắm & Đồ cotton
 
   // Dịch vụ bổ sung
-  bool addonIron = false; // Ủi hơi nước chống nhăn (+20.000đ)
-  bool addonFragrance = true; // Hương hoa ban mai (Miễn phí)
-  bool addonBag = true; // Túi vải niêm phong 3T (Miễn phí)
+  bool isIronChecked = true;
+  bool isFragranceChecked = true;
+  bool isSealChecked = true;
 
-  // Danh sách tùy chọn khối lượng
-  final List<Map<String, dynamic>> weightOptions = [
-    {
-      'label': '3.0 kg',
-      'sub': '~ 8-10 chiếc',
-      'price': 75000,
-      'isPopular': false,
-    },
-    {
-      'label': '5.0 kg',
-      'sub': '~ 15-18 chiếc',
-      'price': 125000,
-      'isPopular': true,
-    },
-    {
-      'label': '8.0 kg',
-      'sub': 'Chăn ga & nhiều đồ',
-      'price': 200000,
-      'isPopular': false,
-    },
-    {
-      'label': 'Chưa rõ kg',
-      'sub': 'Shipper cân sau',
-      'price': 0,
-      'isPopular': false,
-    },
-  ];
+  final TextEditingController _notesController = TextEditingController(
+    text: 'Vải mỏng cần giặt nhiệt dịu 55°C, bấm mã seal niêm phong trước mặt khi nhận đồ...',
+  );
 
-  // --- HÀM TÍNH TỔNG TIỀN TỰ ĐỘNG ---
-  int calculateTotal() {
-    if (selectedService == 2) {
-      // Giặt hấp cao cấp (tạm tính 1 món 60k)
-      int base = 60000;
-      if (addonIron) base += 20000;
-      return base;
-    } else {
-      // Giặt sấy tinh tươm theo kg
-      int basePrice = weightOptions[selectedWeightIndex]['price'] as int;
-      if (basePrice == 0) return 0; // Chưa rõ kg -> Shipper cân sau
-      if (addonIron) basePrice += 20000;
-      return basePrice;
-    }
+  // --- HÀM TÍNH TOÁN DỮ LIỆU ---
+  int get totalGarments => shirtsCount + pantsCount + dressesCount + towelsCount;
+  int get washCost => (weight * pricePerKg).round();
+  int get ironCost => isIronChecked ? ironPrice : 0;
+  int get totalPrice => washCost + ironCost;
+
+  void _showToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Color(0xFF4CD7F6), size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF512128),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    int totalPrice = calculateTotal();
-    String currentWeightLabel = weightOptions[selectedWeightIndex]['label'];
-
     return Scaffold(
       backgroundColor: bgSurface,
 
-      // 1. THANH HEADER TRÊN CÙNG
+      // --- 1. HEADER APP BAR ---
       appBar: AppBar(
         backgroundColor: bgSurface.withOpacity(0.95),
         elevation: 0,
         scrolledUnderElevation: 1,
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: onSurface,
-            size: 20,
-          ),
+          icon: const Icon(Icons.arrow_back, color: onSurface, size: 22),
           onPressed: () => Navigator.maybePop(context),
         ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Đặt Lịch Giặt Sấy',
-              style: GoogleFonts.plusJakartaSans(
-                color: onSurface,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              'Bước 1/3: Chọn dịch vụ & khối lượng',
-              style: GoogleFonts.plusJakartaSans(
-                color: outlineColor,
-                fontSize: 11,
-              ),
-            ),
-          ],
+        title: Text(
+          'Đặt Dịch Vụ (Bước 1/3)',
+          style: GoogleFonts.plusJakartaSans(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: onSurface,
+          ),
         ),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               radius: 16,
-              backgroundImage: NetworkImage(
-                'https://lh3.googleusercontent.com/aida/AEtjO1WPa14-Gu1lGEuCFeupI6LQHyolb_Z76YemKA4M9TkVUyjlNl34_077Ov_z7CPdxeuPjOZgIq8f-7fTE0jmNPaDfvixwRcBuJhrygMjfOzbLV03lqqWBc0XIeASfSu6b7Rndhl_a1Nd5ZrhbH8avYtolK38EVocgWywWKekj2yYtp5FoyQoXf_7l-QlCU6Ary1ZpdKFwHO4aAKI7DOPtRogPEGE1sgFYInSG6TuG8UcrDCNfZ6VDhhMZHQA',
-              ),
+              backgroundColor: primaryColor,
+              child: Icon(Icons.person, color: Colors.white, size: 18),
             ),
           ),
         ],
       ),
 
-      // BODY NỘI DUNG CHÍNH
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // STEPPER BAR (BƯỚC 1/3)
-            _buildProgressStepper(),
-            const SizedBox(height: 16),
+      // --- NỘI DUNG CHÍNH ---
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 130),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. PROGRESS STEPPER 3T
+                _buildProgressStepper(),
 
-            // SECTION 1: CHỌN GÓI GIẶT (2 THẺ SONG SONG)
-            _buildServiceSelector(),
-            const SizedBox(height: 20),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 2. BANNER TIÊU CHUẨN 3T
+                      _buildBanner3T(),
+                      const SizedBox(height: 16),
 
-            // SECTION 2: KHỐI LƯỢNG ƯỚC TÍNH (LƯỚI 2X2)
-            _buildWeightGridSelector(),
-            const SizedBox(height: 20),
+                      // 3. GÓI DỊCH VỤ GIẶT ỦI CHÍNH
+                      _buildServicePackageSection(),
+                      const SizedBox(height: 16),
 
-            // SECTION 3: DỊCH VỤ BỔ SUNG
-            _buildAddonsSection(),
-            const SizedBox(height: 16),
+                      // 4. ƯỚC TÍNH KHỐI LƯỢNG (WEIGHT STEPPER)
+                      _buildWeightEstimationSection(),
+                      const SizedBox(height: 16),
 
-            // SECTION 4: THẺ GỢI Ý & TRẤN AN AN TÂM
-            _buildTrustAndGuideCards(),
-            const SizedBox(height: 100), // Khoảng trống cho bottom sheet
-          ],
-        ),
+                      // 5. CHI TIẾT ĐỒ CẦN GIẶT
+                      _buildGarmentsListSection(),
+                      const SizedBox(height: 16),
+
+                      // 6. CHĂM SÓC NÂNG CAO & ĐÓNG GÓI
+                      _buildAddonsSection(),
+                      const SizedBox(height: 16),
+
+                      // 7. GHI CHÚ CHO TIỆM
+                      _buildNotesSection(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // --- 8. FOOTER STICKY BOTTOM BAR ---
+          _buildBottomActionBar(context),
+        ],
       ),
-
-      // 2. STICKY BOTTOM SUMMARY BAR & NÚT CHUYỂN BƯỚC
-      bottomSheet: _buildStickyBottomBar(context, totalPrice, currentWeightLabel),
     );
   }
 
-  // --- WIDGET 1: STEPPER PROGRESS BAR ---
+  // --- WIDGET 1: PROGRESS STEPPER 3T ---
   Widget _buildProgressStepper() {
     return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: surfaceLow,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: surfaceContainer),
-      ),
+      color: cardBg,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Column(
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'BƯỚC 1 / 3',
-                style: GoogleFonts.plusJakartaSans(
-                  color: primaryColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Đang chọn dịch vụ & kg',
-                  style: GoogleFonts.plusJakartaSans(
-                    color: primaryColor,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
+              Row(
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: primaryColor,
+                      shape: BoxShape.circle,
+                    ),
                   ),
+                  const SizedBox(width: 6),
+                  Text(
+                    'QUY TRÌNH ĐẶT 3T',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                'Bước 1 trên 3',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: onSurfaceVariant,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 8),
+
           Row(
             children: [
               Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: primaryColor,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(height: 6, decoration: BoxDecoration(color: primaryColor, borderRadius: BorderRadius.circular(3))),
+                    const SizedBox(height: 4),
+                    Text(
+                      '1. Dịch vụ & Đồ',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
+
               Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: surfaceHigh,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(height: 6, decoration: BoxDecoration(color: surfaceHigh, borderRadius: BorderRadius.circular(3))),
+                    const SizedBox(height: 4),
+                    Text(
+                      '2. Lịch & Địa chỉ',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w500, color: onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 8),
+
               Expanded(
-                child: Container(
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: surfaceHigh,
-                    borderRadius: BorderRadius.circular(3),
-                  ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(height: 6, decoration: BoxDecoration(color: surfaceHigh, borderRadius: BorderRadius.circular(3))),
+                    const SizedBox(height: 4),
+                    Text(
+                      '3. Xác nhận',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.w500, color: onSurfaceVariant),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -243,81 +272,208 @@ class _BookingStep1ScreenState extends State<BookingStep1Screen> {
     );
   }
 
-  // --- WIDGET 2: CHỌN GÓI GIẶT ---
-  Widget _buildServiceSelector() {
+  // --- WIDGET 2: BANNER TIÊU CHUẨN 3T ---
+  Widget _buildBanner3T() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: secondaryFixed,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.verified, size: 14, color: Color(0xFF3E0022)),
+                      const SizedBox(width: 4),
+                      Text(
+                        'Tiêu chuẩn WashSmart 3T',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF3E0022),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Giặt Riêng 1 Máy / Khách',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: onSurface,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Khử khuẩn UV 99.9%, sấy thơm tự nhiên & gấp nếp tươm tất chuẩn tủ đồ cao cấp.',
+                  style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant, height: 1.3),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Image.network(
+              'https://lh3.googleusercontent.com/aida-public/AB6AXuB40T_eeTL8ZWeMgTM5cDBWPWC_w8J2kTj5QMKs3-gAxrupHisWQPvfYUA4dpir38BqEgggwmT9swjyXU8j7Vcr9R62seh0lsIexutDFGKunAfSZffl2fuKvf9aXlaalMSdmLXA_Aa-ceCym0XTtHZi7uZCLsQ_c99SyW0epHqI_bIbSVDFU4_uT7qTZvQ8KO_P4O4kWs_j14NqWrz9lzCZfFl6BRIjHtfNknUm1EasS9Useu-bYyCnZA',
+              width: 80,
+              height: 80,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Container(
+                width: 80,
+                height: 80,
+                color: surfaceContainer,
+                child: const Icon(Icons.local_laundry_service, color: primaryColor),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 3: GÓI DỊCH VỤ GIẶT ỦI CHÍNH ---
+  Widget _buildServicePackageSection() {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              'Chọn gói giặt',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: onSurface,
-              ),
+            Row(
+              children: [
+                const Icon(Icons.local_laundry_service, color: primaryColor, size: 20),
+                const SizedBox(width: 6),
+                Text(
+                  'Gói Dịch Vụ Giặt Ủi',
+                  style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface),
+                ),
+              ],
             ),
-            Text(
-              '2 lựa chọn',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: outlineColor,
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(color: primaryFixed, borderRadius: BorderRadius.circular(12)),
+              child: Text(
+                'Phổ biến nhất',
+                style: GoogleFonts.plusJakartaSans(fontSize: 10, fontWeight: FontWeight.bold, color: primaryColor),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => selectedService = 1),
-                child: _buildServiceCard(
-                  title: 'Giặt sấy tinh tươm',
-                  sub: 'Giặt sạch, sấy khô thơm tho',
-                  price: '25.000đ/kg',
-                  icon: Icons.local_laundry_service,
-                  isSelected: selectedService == 1,
+        const SizedBox(height: 8),
+
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: cardBg,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(color: surfaceContainer, borderRadius: BorderRadius.circular(12)),
+                    child: const Icon(Icons.dry_cleaning, color: primaryColor, size: 28),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              'Giặt Sấy Tinh Tươm',
+                              style: GoogleFonts.plusJakartaSans(fontSize: 16, fontWeight: FontWeight.bold, color: onSurface),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.check_circle, color: primaryColor, size: 18),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Giặt sạch sâu, sấy dịu chống co rút & gấp xếp ngay ngắn theo chuẩn khách sạn.',
+                          style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: surfaceLow, borderRadius: BorderRadius.circular(12)),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Đơn giá định mức:', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: onSurfaceVariant)),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text('19.000 đ', style: GoogleFonts.plusJakartaSans(fontSize: 18, fontWeight: FontWeight.bold, color: primaryColor)),
+                        Text(' / kg', style: GoogleFonts.plusJakartaSans(fontSize: 12, color: onSurfaceVariant)),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => selectedService = 2),
-                child: _buildServiceCard(
-                  title: 'Giặt hấp cao cấp',
-                  sub: 'Vest, dạ, lụa & váy tiệc',
-                  price: '60.000đ/món',
-                  icon: Icons.dry_cleaning,
-                  isSelected: selectedService == 2,
-                ),
+              const SizedBox(height: 8),
+
+              Row(
+                children: [
+                  const Icon(Icons.shield, size: 16, color: secondaryColor),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      'Bảo hiểm hư hại vải lên tới 3.000.000 đ/đơn hàng',
+                      style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.w600, color: secondaryColor),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildServiceCard({
-    required String title,
-    required String sub,
-    required String price,
-    required IconData icon,
-    required bool isSelected,
-  }) {
+  // --- WIDGET 4: ƯỚC TÍNH KHỐI LƯỢNG ---
+  Widget _buildWeightEstimationSection() {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isSelected ? primaryColor.withOpacity(0.05) : cardBg,
+        color: cardBg,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isSelected ? primaryColor : outlineVariant.withOpacity(0.6),
-          width: isSelected ? 2 : 1,
-        ),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -325,54 +481,100 @@ class _BookingStep1ScreenState extends State<BookingStep1Screen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: isSelected ? primaryColor.withOpacity(0.15) : surfaceLow,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  icon,
-                  size: 20,
-                  color: isSelected ? primaryColor : outlineColor,
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.scale, color: primaryColor, size: 20),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Ước Tính Khối Lượng',
+                        style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface),
+                      ),
+                    ],
+                  ),
+                  Text('Ước tính để điều phối máy & túi đựng', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant)),
+                ],
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    weight.toStringAsFixed(1),
+                    style: GoogleFonts.plusJakartaSans(fontSize: 26, fontWeight: FontWeight.bold, color: primaryColor),
+                  ),
+                  const SizedBox(width: 2),
+                  Text('kg', style: GoogleFonts.plusJakartaSans(fontSize: 13, fontWeight: FontWeight.bold, color: onSurface)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  if (weight > 1.0) {
+                    setState(() => weight = double.parse((weight - 0.5).toStringAsFixed(1)));
+                  }
+                },
+                icon: const Icon(Icons.remove, size: 20),
+                style: IconButton.styleFrom(
+                  backgroundColor: surfaceContainer,
+                  foregroundColor: onSurface,
+                  fixedSize: const Size(48, 48),
                 ),
               ),
-              Icon(
-                isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                size: 20,
-                color: isSelected ? primaryColor : outlineVariant,
+              const SizedBox(width: 10),
+
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(color: surfaceLow, borderRadius: BorderRadius.circular(24)),
+                  child: Text(
+                    '~ 10-14 món đồ hè',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.w600, color: onSurfaceVariant),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              IconButton(
+                onPressed: () {
+                  if (weight < 30.0) {
+                    setState(() => weight = double.parse((weight + 0.5).toStringAsFixed(1)));
+                  }
+                },
+                icon: const Icon(Icons.add, size: 20),
+                style: IconButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  fixedSize: const Size(48, 48),
+                  elevation: 2,
+                ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            title,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              color: onSurface,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(
-            sub,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 10,
-              color: outlineColor,
-            ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 8),
-          const Divider(height: 1, color: surfaceHigh),
-          const SizedBox(height: 6),
-          Text(
-            price,
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: isSelected ? primaryColor : outlineColor,
+
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(color: surfaceLow, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, size: 18, color: secondaryColor),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Shipper mang theo cân điện tử mini cân trực tiếp khi nhận đồ và chốt số ký chính xác cùng bạn.',
+                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant, height: 1.3),
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -380,514 +582,440 @@ class _BookingStep1ScreenState extends State<BookingStep1Screen> {
     );
   }
 
-  // --- WIDGET 3: KHỐI LƯỢNG ƯỚC TÍNH (LƯỚI 2X2) ---
-  Widget _buildWeightGridSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Khối lượng ước tính',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: onSurface,
-              ),
-            ),
-            Text(
-              'Cân lại khi nhận đồ',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: outlineColor,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            childAspectRatio: 2.1,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
-          ),
-          itemCount: weightOptions.length,
-          itemBuilder: (context, index) {
-            final option = weightOptions[index];
-            final bool isSelected = selectedWeightIndex == index;
-            final bool isUnclear = index == 3;
-
-            return GestureDetector(
-              onTap: () => setState(() => selectedWeightIndex = index),
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: isSelected ? primaryColor.withOpacity(0.05) : cardBg,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(
-                    color: isSelected ? primaryColor : outlineVariant.withOpacity(0.6),
-                    width: isSelected ? 2 : 1,
+  // --- WIDGET 5: CHI TIẾT ĐỒ CẦN GIẶT ---
+  Widget _buildGarmentsListSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.checkroom, color: primaryColor, size: 20),
+                      const SizedBox(width: 6),
+                      Text('Chi Tiết Đồ Cần Giặt', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface)),
+                    ],
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            if (isUnclear) ...[
-                              const Icon(Icons.balance, size: 16, color: primaryColor),
-                              const SizedBox(width: 4),
-                            ],
-                            Text(
-                              option['label'],
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: onSurface,
-                              ),
-                            ),
-                            if (option['isPopular'] == true) ...[
-                              const SizedBox(width: 4),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  'PHỔ BIẾN',
-                                  style: GoogleFonts.plusJakartaSans(
-                                    fontSize: 8,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                        Icon(
-                          isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-                          size: 18,
-                          color: isSelected ? primaryColor : outlineVariant,
-                        ),
-                      ],
-                    ),
-                    Text(
-                      option['sub'],
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 10,
-                        color: outlineColor,
-                      ),
-                    ),
-                  ],
+                  Text('Giúp tiệm phân loại nhiệt độ & giặt riêng', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant)),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(color: primaryFixed, borderRadius: BorderRadius.circular(12)),
+                child: Text(
+                  'Tổng: $totalGarments món',
+                  style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold, color: primaryColor),
                 ),
               ),
-            );
-          },
-        ),
-      ],
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          _buildGarmentStepperRow(
+            icon: Icons.dry_cleaning,
+            title: 'Áo sơ mi & Áo thun',
+            sub: 'Giặt sấy & Ủi hơi nước',
+            count: shirtsCount,
+            onMin: () => setState(() => shirtsCount = (shirtsCount > 0) ? shirtsCount - 1 : 0),
+            onAdd: () => setState(() => shirtsCount++),
+          ),
+          const SizedBox(height: 8),
+
+          _buildGarmentStepperRow(
+            icon: Icons.straighten,
+            title: 'Quần tây & Quần jean',
+            sub: 'Giặt sấy & Ủi tạo nếp',
+            count: pantsCount,
+            onMin: () => setState(() => pantsCount = (pantsCount > 0) ? pantsCount - 1 : 0),
+            onAdd: () => setState(() => pantsCount++),
+          ),
+          const SizedBox(height: 8),
+
+          _buildGarmentStepperRow(
+            icon: Icons.style,
+            title: 'Đầm công sở / Váy lụa',
+            sub: 'Giặt sấy nhiệt dịu',
+            count: dressesCount,
+            onMin: () => setState(() => dressesCount = (dressesCount > 0) ? dressesCount - 1 : 0),
+            onAdd: () => setState(() => dressesCount++),
+          ),
+          const SizedBox(height: 8),
+
+          _buildGarmentStepperRow(
+            icon: Icons.layers,
+            title: 'Khăn tắm & Đồ cotton',
+            sub: 'Khử khuẩn UV thơm mát',
+            count: towelsCount,
+            onMin: () => setState(() => towelsCount = (towelsCount > 0) ? towelsCount - 1 : 0),
+            onAdd: () => setState(() => towelsCount++),
+          ),
+          const SizedBox(height: 12),
+
+          SizedBox(
+            width: double.infinity,
+            height: 40,
+            child: ElevatedButton.icon(
+              onPressed: () => _showToast('Tính năng thêm loại trang phục khác sắp ra mắt!'),
+              icon: const Icon(Icons.add_circle_outline, size: 18, color: primaryColor),
+              label: Text(
+                'Thêm loại trang phục khác',
+                style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: primaryColor),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: surfaceContainer,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  // --- WIDGET 4: DỊCH VỤ BỔ SUNG ---
-  Widget _buildAddonsSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Dịch vụ bổ sung',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: onSurface,
-              ),
-            ),
-            Text(
-              'Tùy chọn thêm',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                color: outlineColor,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-
-        _buildAddonTile(
-          icon: Icons.iron,
-          title: 'Ủi hơi nước chống nhăn',
-          sub: 'Áo sơ mi, đầm & quần âu',
-          priceTag: '+20.000đ',
-          isFree: false,
-          isChecked: addonIron,
-          onTap: () => setState(() => addonIron = !addonIron),
-        ),
-        const SizedBox(height: 8),
-
-        _buildAddonTile(
-          icon: Icons.local_florist,
-          title: 'Hương hoa ban mai cao cấp',
-          sub: 'Lưu hương dài lâu dịu nhẹ',
-          priceTag: 'MIỄN PHÍ',
-          isFree: true,
-          isChecked: addonFragrance,
-          onTap: () => setState(() => addonFragrance = !addonFragrance),
-        ),
-        const SizedBox(height: 8),
-
-        _buildAddonTile(
-          icon: Icons.verified,
-          title: 'Túi vải niêm phong 3T',
-          sub: 'Bảo vệ quần áo chống ẩm & mưa bụi',
-          priceTag: 'MIỄN PHÍ',
-          isFree: true,
-          isChecked: addonBag,
-          onTap: () => setState(() => addonBag = !addonBag),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAddonTile({
+  Widget _buildGarmentStepperRow({
     required IconData icon,
     required String title,
     required String sub,
-    required String priceTag,
-    required bool isFree,
-    required bool isChecked,
-    required VoidCallback onTap,
+    required int count,
+    required VoidCallback onMin,
+    required VoidCallback onAdd,
   }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: isChecked ? primaryColor.withOpacity(0.05) : cardBg,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: isChecked ? primaryColor.withOpacity(0.4) : outlineVariant.withOpacity(0.6),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: isChecked ? primaryColor.withOpacity(0.15) : surfaceLow,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    icon,
-                    size: 18,
-                    color: isChecked ? primaryColor : outlineColor,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          title,
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: onSurface,
-                          ),
-                        ),
-                        if (isFree) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: secondaryColor.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              'MIỄN PHÍ',
-                              style: GoogleFonts.plusJakartaSans(
-                                fontSize: 8,
-                                fontWeight: FontWeight.bold,
-                                color: secondaryColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    Text(
-                      sub,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 10,
-                        color: outlineColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                if (!isFree)
-                  Text(
-                    priceTag,
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: primaryColor,
-                    ),
-                  ),
-                const SizedBox(width: 8),
-                Container(
-                  width: 20,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: isChecked ? primaryColor : cardBg,
-                    borderRadius: BorderRadius.circular(4),
-                    border: Border.all(
-                      color: isChecked ? primaryColor : outlineVariant,
-                    ),
-                  ),
-                  child: isChecked
-                      ? const Icon(Icons.check, size: 14, color: Colors.white)
-                      : null,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // --- WIDGET 5: TRUST & GUIDE CARDS ---
-  Widget _buildTrustAndGuideCards() {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: surfaceLow,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: surfaceContainer),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: surfaceLow, borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
             children: [
               Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.shopping_bag, size: 14, color: primaryColor),
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(color: surfaceContainer, borderRadius: BorderRadius.circular(8)),
+                child: Icon(icon, size: 20, color: primaryColor),
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurface, height: 1.4),
-                    children: [
-                      TextSpan(
-                        text: 'Gợi ý: ',
-                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold, color: primaryColor),
-                      ),
-                      const TextSpan(text: '5.0 kg tương đương khoảng '),
-                      TextSpan(
-                        text: '15 – 20 món đồ ',
-                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold),
-                      ),
-                      const TextSpan(text: '(5 áo thun, 3 quần jean, 4 đồ lót, 2 khăn tắm, 2 áo khoác nhẹ).'),
-                    ],
-                  ),
-                ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: onSurface)),
+                  Text(sub, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: onSurfaceVariant)),
+                ],
               ),
             ],
           ),
-        ),
-        const SizedBox(height: 10),
-
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: cardBg,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: outlineVariant.withOpacity(0.6)),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              const Text('💡', style: TextStyle(fontSize: 16)),
-              const SizedBox(width: 8),
-              Expanded(
-                child: RichText(
-                  text: TextSpan(
-                    style: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineColor, height: 1.4),
-                    children: [
-                      TextSpan(
-                        text: 'Đừng lo nếu chưa chọn chuẩn kg! ',
-                        style: GoogleFonts.plusJakartaSans(fontWeight: FontWeight.bold, color: onSurface),
-                      ),
-                      const TextSpan(
-                        text: 'Shipper 3T sẽ mang cân điện tử tới cân lại thực tế khi nhận đồ và chốt hóa đơn chính xác cho bạn.',
-                      ),
-                    ],
-                  ),
+              InkWell(
+                onTap: onMin,
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(color: cardBg, shape: BoxShape.circle),
+                  child: const Icon(Icons.remove, size: 16, color: onSurface),
+                ),
+              ),
+              SizedBox(
+                width: 28,
+                child: Text('$count', textAlign: TextAlign.center, style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface)),
+              ),
+              InkWell(
+                onTap: onAdd,
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: const BoxDecoration(color: primaryColor, shape: BoxShape.circle),
+                  child: const Icon(Icons.add, size: 16, color: Colors.white),
                 ),
               ),
             ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  // --- WIDGET 6: STICKY BOTTOM BAR & CHUYỂN BƯỚC ---
-  Widget _buildStickyBottomBar(BuildContext context, int totalPrice, String weightLabel) {
+  // --- WIDGET 6: CHĂM SÓC NÂNG CAO & ĐÓNG GÓI ---
+  Widget _buildAddonsSection() {
     return Container(
-      padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: bgSurface.withOpacity(0.98),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(
-            color: primaryColor.withOpacity(0.12),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.auto_awesome, color: primaryColor, size: 20),
+              const SizedBox(width: 6),
+              Text('Chăm Sóc Nâng Cao & Đóng Gói', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface)),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          _buildAddonCheckboxRow(
+            title: 'Ủi hơi nước chống nhăn form',
+            desc: 'Ủi đứng áp suất nhiệt, giữ phom áo sơ mi & quần âu',
+            priceText: '+20.000 đ',
+            isPricePrimary: true,
+            value: isIronChecked,
+            onChanged: (val) => setState(() => isIronChecked = val ?? false),
+          ),
+          const SizedBox(height: 8),
+
+          _buildAddonCheckboxRow(
+            title: 'Hương Hoa Ban Mai 3T',
+            badgeText: '72 Giờ',
+            desc: 'Chiết xuất tinh dầu thảo mộc dịu nhẹ, an toàn da nhạy cảm',
+            priceText: 'Miễn phí (0 đ)',
+            value: isFragranceChecked,
+            onChanged: (val) => setState(() => isFragranceChecked = val ?? false),
+          ),
+          const SizedBox(height: 8),
+
+          _buildAddonCheckboxRow(
+            title: 'Túi vải niêm phong chống nước',
+            badgeText: '#SEAL-3T',
+            badgeBgColor: tertiaryColor,
+            desc: 'Khóa seal an toàn chống ẩm bụi, mở seal tại nhà khách',
+            priceText: 'Miễn phí (0 đ)',
+            value: isSealChecked,
+            onChanged: (val) => setState(() => isSealChecked = val ?? false),
           ),
         ],
-        border: const Border(top: BorderSide(color: surfaceContainer)),
       ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    );
+  }
+
+  Widget _buildAddonCheckboxRow({
+    required String title,
+    String? badgeText,
+    Color badgeBgColor = secondaryColor,
+    required String desc,
+    required String priceText,
+    bool isPricePrimary = false,
+    required bool value,
+    required ValueChanged<bool?> onChanged,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(color: surfaceLow, borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 24,
+            height: 24,
+            child: Checkbox(
+              value: value,
+              activeColor: primaryColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              onChanged: onChanged,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text(
-                      totalPrice == 0
-                          ? 'Tạm tính (Shipper cân sau)'
-                          : 'Tạm tính ước lượng (Gói $weightLabel)',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        color: outlineColor,
+                    Text(title, style: GoogleFonts.plusJakartaSans(fontSize: 12, fontWeight: FontWeight.bold, color: onSurface)),
+                    if (badgeText != null) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                        decoration: BoxDecoration(color: badgeBgColor, borderRadius: BorderRadius.circular(10)),
+                        child: Text(badgeText, style: GoogleFonts.plusJakartaSans(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white)),
                       ),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.baseline,
-                      textBaseline: TextBaseline.alphabetic,
-                      children: [
-                        Text(
-                          totalPrice == 0
-                              ? 'Tính sau'
-                              : '${totalPrice.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}đ',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: primaryColor,
-                          ),
-                        ),
-                        if (totalPrice > 0) ...[
-                          const SizedBox(width: 6),
-                          Text(
-                            '${(totalPrice + 20000).toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}đ',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontSize: 11,
-                              color: outlineColor,
-                              decoration: TextDecoration.lineThrough,
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
+                    ],
                   ],
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: secondaryColor.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
+                const SizedBox(height: 2),
+                Text(desc, style: GoogleFonts.plusJakartaSans(fontSize: 10, color: onSurfaceVariant)),
+              ],
+            ),
+          ),
+          Text(
+            priceText,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isPricePrimary ? primaryColor : secondaryColor,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 7: GHI CHÚ CHO TIỆM ---
+  Widget _buildNotesSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.edit_note, color: primaryColor, size: 20),
+              const SizedBox(width: 6),
+              Text('Ghi Chú Cho Chuyên Viên Giặt', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold, color: onSurface)),
+            ],
+          ),
+          const SizedBox(height: 8),
+
+          TextField(
+            controller: _notesController,
+            maxLines: 2,
+            style: GoogleFonts.plusJakartaSans(fontSize: 12, color: onSurface),
+            decoration: InputDecoration(
+              hintText: 'Ví dụ: Vải mỏng cần giặt nhiệt dịu 55°C, bấm mã seal niêm phong trước mặt khi nhận đồ...',
+              hintStyle: GoogleFonts.plusJakartaSans(fontSize: 11, color: outlineVariant),
+              filled: true,
+              fillColor: surfaceLow,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+              contentPadding: const EdgeInsets.all(12),
+            ),
+          ),
+          const SizedBox(height: 6),
+
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Nhắc hẹn đặc biệt về cổ áo, vết ố hoặc chất liệu', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: onSurfaceVariant)),
+              Text('${_notesController.text.length}/200', style: GoogleFonts.plusJakartaSans(fontSize: 10, color: onSurfaceVariant)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 8: STICKY BOTTOM ACTION BAR (TÍCH HỢP SẴN CHUYỂN BƯỚC 2) ---
+  Widget _buildBottomActionBar(BuildContext context) {
+    return Positioned(
+      left: 0,
+      right: 0,
+      bottom: 0,
+      child: Container(
+        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20),
+        decoration: BoxDecoration(
+          color: cardBg.withOpacity(0.98),
+          boxShadow: [
+            BoxShadow(color: primaryColor.withOpacity(0.08), blurRadius: 16, offset: const Offset(0, -4)),
+          ],
+          border: const Border(top: BorderSide(color: surfaceContainer)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.local_shipping, size: 12, color: secondaryColor),
-                      const SizedBox(width: 4),
-                      Text(
-                        'Freeship nội khu',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          color: secondaryColor,
-                        ),
+                      Row(
+                        children: [
+                          Text('Tạm tính ước lượng:', style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant)),
+                          const SizedBox(width: 4),
+                          const Icon(Icons.help_outline, size: 14, color: onSurfaceVariant),
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            '${totalPrice.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')} đ',
+                            style: GoogleFonts.plusJakartaSans(fontSize: 20, fontWeight: FontWeight.bold, color: primaryColor),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '(${weight.toStringAsFixed(1)}kg: ${washCost ~/ 1000}k${isIronChecked ? ' + Ủi: ${ironPrice ~/ 1000}k' : ''})',
+                            style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-
-            // Nút bấm lớn chuyển sang Bước 2
-            SizedBox(
-              width: double.infinity,
-              height: 48,
-              child: ElevatedButton(
-                onPressed: () {
-                  // 🚀 Chuyển hướng sang BookingStep2Screen
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const BookingStep2Screen(),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(color: surfaceHigh, borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      children: [
+                        Container(width: 6, height: 6, decoration: const BoxDecoration(color: primaryColor, shape: BoxShape.circle)),
+                        const SizedBox(width: 6),
+                        Text('$totalGarments món đồ', style: GoogleFonts.plusJakartaSans(fontSize: 11, fontWeight: FontWeight.bold, color: onSurface)),
+                      ],
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryColor,
-                  elevation: 4,
-                  shadowColor: primaryColor.withOpacity(0.3),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // 🚀 Lệnh chuyển bước 2
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const BookingStep2Screen(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: primaryColor,
+                    foregroundColor: Colors.white,
+                    elevation: 4,
+                    shadowColor: primaryColor.withOpacity(0.3),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Tiếp tục: Chọn lịch hẹn (Bước 2/3)', style: GoogleFonts.plusJakartaSans(fontSize: 14, fontWeight: FontWeight.bold)),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.arrow_forward, size: 18),
+                    ],
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Tiếp tục: Chọn lịch & Địa chỉ',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    const Icon(Icons.arrow_forward, size: 18, color: Colors.white),
-                  ],
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

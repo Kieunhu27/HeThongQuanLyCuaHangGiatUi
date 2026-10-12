@@ -1,31 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'confirm_receipt_screen.dart'; // 🚀 Giữ nguyên luồng chuyển màn hình xác nhận
+import 'confirm_receipt_screen.dart'; // Màn hình xác nhận đã nhận hàng
 
-class OrderTrackingScreen extends StatelessWidget {
-  // 🚀 Giữ nguyên luồng trạng thái đơn hàng: 'confirmed', 'collecting', 'washing', 'delivering'
+class OrderTrackingScreen extends StatefulWidget {
+  // Luồng nhận trạng thái đơn hàng: 'confirmed', 'collecting', 'washing', 'delivering'
   final String orderStatus;
 
   const OrderTrackingScreen({
     super.key,
-    this.orderStatus = 'delivering', // Mặc định là 'delivering' để kiểm thử
+    this.orderStatus = 'delivering', // Mặc định 'delivering' để thử nghiệm luồng chuyển màn hình
   });
 
-  // Bảng màu chuẩn Brand Tokens WashSmart 3T theo HTML config mới
+  @override
+  State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
+}
+
+class _OrderTrackingScreenState extends State<OrderTrackingScreen>
+    with SingleTickerProviderStateMixin {
+  // Brand Color Tokens WashSmart 3T
   static const Color primaryColor = Color(0xFFB90538);
   static const Color primaryContainer = Color(0xFFDC2C4F);
+  static const Color primaryFixed = Color(0xFFFFDADB);
   static const Color secondaryColor = Color(0xFFB4136D);
+  static const Color secondaryFixed = Color(0xFFFFD9E4);
   static const Color tertiaryColor = Color(0xFF006577);
   static const Color bgSurface = Color(0xFFFFF8F7);
   static const Color cardBg = Colors.white;
   static const Color surfaceLow = Color(0xFFFFF0F0);
   static const Color surfaceContainer = Color(0xFFFFE9EA);
-  static const Color surfaceHigh = Color(0xFFFFE1E3);
+  static const Color surfaceVariant = Color(0xFFFFD9DC);
   static const Color onSurface = Color(0xFF370C14);
   static const Color onSurfaceVariant = Color(0xFF5B4041);
-  static const Color outlineColor = Color(0xFF8F6F71);
+  static const Color outlineVariant = Color(0xFFE3BDBF);
 
-  // 🚀 Giữ nguyên luồng hiển thị Hộp thoại thông báo cũ
+  late AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Animation nhấp nháy chấm live & biểu tượng tiến độ
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1000),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
   void _showActionDialog(BuildContext context, String title, String content) {
     showDialog(
       context: context,
@@ -62,122 +87,228 @@ class OrderTrackingScreen extends StatelessWidget {
     );
   }
 
+  void _showToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Color(0xFF4CD7F6), size: 18),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                message,
+                style: GoogleFonts.plusJakartaSans(fontSize: 13, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: const Color(0xFF512128),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: bgSurface,
 
-      // --- 1. APP BAR (Giao diện mới + Nút luồng cũ) ---
-      appBar: AppBar(
-        backgroundColor: bgSurface.withOpacity(0.95),
-        elevation: 0,
-        scrolledUnderElevation: 1,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: onSurface, size: 22),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Chi tiết đơn hàng',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: onSurface,
-              ),
-            ),
-            Text(
-              '#WS3T-8892',
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: primaryColor,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home_outlined, color: onSurfaceVariant, size: 22),
-            onPressed: () => Navigator.popUntil(context, (route) => route.isFirst),
-          ),
-          IconButton(
-            icon: const Icon(Icons.headset_mic_outlined, color: primaryColor, size: 22),
-            onPressed: () => _showActionDialog(
-              context,
-              'Tổng đài CSKH 3T',
-              'Đang kết nối tới hotline hỗ trợ: 1900 3388 (Miễn phí 24/7)',
-            ),
-          ),
-          const SizedBox(width: 4),
-        ],
-      ),
+      // --- 1. HEADER APP BAR ---
+      appBar: _buildAppBar(context),
 
       // --- NỘI DUNG CHÍNH ---
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 140),
-            child: Column(
-              children: [
-                // KHỐI 1: TRẠNG THÁI & STEPPER TIẾN TRÌNH (Theo orderStatus cũ)
-                _buildStatusTrackerCard(),
-                const SizedBox(height: 12),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // KHỐI 1: TÓM TẮT KHÁCH HÀNG & TRẠNG THÁI
+            _buildCustomerStrip(),
+            const SizedBox(height: 12),
 
-                // KHỐI 2: GÓI GIẶT & DANH SÁCH MÓN ĐỒ GỬI (Kết hợp giao diện mới & luồng cũ)
-                _buildPackageAndGarmentsCard(),
-                const SizedBox(height: 12),
+            // KHỐI 2: THẺ DỊCH VỤ CHÍNH VỚI ĐỒ HỌA 3T
+            _buildMainServiceCard(),
+            const SizedBox(height: 12),
 
-                // KHỐI 3: ĐỊA CHỈ & LỊCH HẸN GIAO NHẬN
-                _buildDeliveryScheduleCard(),
-                const SizedBox(height: 12),
+            // KHỐI 3: CHI TIẾT ĐỒ GỬI GIẶT (12 MÓN • 5.0 KG)
+            _buildGarmentsDetailCard(),
+            const SizedBox(height: 12),
 
-                // KHỐI 4: CHI TIẾT BẢNG KÊ THANH TOÁN
-                _buildPaymentCard(),
-              ],
-            ),
-          ),
+            // KHỐI 4: DÒNG THỜI GIAN XỬ LÝ (5 GIAI ĐOẠN)
+            _buildTimelineSection(),
+            const SizedBox(height: 16),
 
-          // STICKY BOTTOM ACTIONS (Giữ nguyên luồng kiểm tra điều kiện nút xác nhận)
-          _buildStickyBottomActionBar(context),
-        ],
+            // KHỐI 5: NÚT HÀNH ĐỘNG VỚI LUỒNG CHUYỂN MÀN HÌNH
+            _buildBottomActions(context),
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }
 
-  // --- KHỐI 1: STATUS TRACKER & STEPPER CARD ---
-  Widget _buildStatusTrackerCard() {
-    final bool isDelivering = orderStatus == 'delivering';
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+  // --- WIDGET 1: HEADER APP BAR ---
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: bgSurface.withOpacity(0.85),
+      elevation: 0,
+      scrolledUnderElevation: 1,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: onSurface, size: 22),
+        onPressed: () => Navigator.maybePop(context),
+      ),
+      centerTitle: true,
+      title: Column(
+        children: [
+          Text(
+            'Theo Dõi Tiến Độ Đơn Hàng',
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: onSurface,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FadeTransition(
+                opacity: _pulseController,
+                child: Container(
+                  width: 6,
+                  height: 6,
+                  decoration: const BoxDecoration(
+                    color: primaryColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '#WS3T-8892',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 11,
+                  fontWeight: FontWeight.bold,
+                  color: primaryColor,
+                  letterSpacing: 0.5,
+                ),
+              ),
+            ],
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: CircleAvatar(
+            radius: 16,
+            backgroundColor: primaryColor,
+            child: const Icon(Icons.person, color: Colors.white, size: 18),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- WIDGET 2: TÓM TẮT KHÁCH HÀNG ---
+  Widget _buildCustomerStrip() {
+    final bool isDelivering = widget.orderStatus == 'delivering';
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: surfaceLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: secondaryFixed,
+                child: Text(
+                  'KN',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF3E0022),
+                    fontSize: 14,
+                  ),
                 ),
-                child: Row(
-                  children: [
-                    Container(
+              ),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        'Kiều Như',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: onSurface,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: primaryFixed,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.workspace_premium, size: 12, color: primaryColor),
+                            const SizedBox(width: 2),
+                            Text(
+                              'Hạng Vàng',
+                              style: GoogleFonts.plusJakartaSans(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: primaryColor,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Hôm nay, 10:24 • Heritage Manor',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'TRẠNG THÁI',
+                style: GoogleFonts.plusJakartaSans(
+                  fontSize: 9,
+                  fontWeight: FontWeight.bold,
+                  color: tertiaryColor,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Row(
+                children: [
+                  FadeTransition(
+                    opacity: _pulseController,
+                    child: Container(
                       width: 8,
                       height: 8,
                       decoration: const BoxDecoration(
@@ -185,166 +316,27 @@ class OrderTrackingScreen extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      isDelivering
-                          ? 'Shipper đang giao đồ sạch tới bạn'
-                          : 'Đang xử lý giặt sấy chuyên sâu',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: primaryColor,
-                      ),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    isDelivering ? 'Đang giao hàng' : 'Đang giặt sấy',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: surfaceContainer,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  '#WS3T-8892',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          // Progress Tracker (Dynamic theo orderStatus)
-          Stack(
-            alignment: Alignment.topCenter,
-            children: [
-              Positioned(
-                top: 14,
-                left: 24,
-                right: 24,
-                child: Container(
-                  height: 3,
-                  color: primaryColor,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _buildProgressStep('1', 'Đặt đơn', '13:30', isDone: true),
-                  _buildProgressStep('2', 'Cân & Seal', '14:15 • 5.0kg', isDone: true),
-                  _buildProgressStep(
-                    '3',
-                    'Giặt sấy 3T',
-                    isDelivering ? 'Hoàn tất' : 'Đang xử lý',
-                    isDone: isDelivering,
-                    isActive: orderStatus == 'washing',
-                  ),
-                  _buildProgressStep(
-                    '4',
-                    'Đang giao',
-                    isDelivering ? '15-20 phút' : 'Chờ giao',
-                    isActive: isDelivering,
                   ),
                 ],
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-
-          // Shipper Tracking Banner Box
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: surfaceLow,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: surfaceHigh),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Row(
-                    children: [
-                      const Icon(Icons.local_shipping, color: primaryColor, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          isDelivering
-                              ? 'Shipper Nguyễn Văn Nam đang tới Chung cư Sunrise City'
-                              : 'Tiệm giặt đang phân loại & hấp diệt khuẩn vải',
-                          style: GoogleFonts.plusJakartaSans(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: onSurface,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  isDelivering ? '~15 phút' : 'Đang xử lý',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
-                  ),
-                ),
-              ],
-            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildProgressStep(String step, String label, String time, {bool isDone = false, bool isActive = false}) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 14,
-          backgroundColor: isActive ? primaryColor : (isDone ? primaryColor : surfaceHigh),
-          child: isActive
-              ? const Icon(Icons.two_wheeler, size: 15, color: Colors.white)
-              : (isDone
-                  ? const Icon(Icons.check, size: 15, color: Colors.white)
-                  : Text(
-                      step,
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 11,
-                        fontWeight: FontWeight.bold,
-                        color: onSurfaceVariant,
-                      ),
-                    )),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 11,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
-            color: isActive ? primaryColor : onSurface,
-          ),
-        ),
-        Text(
-          time,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 10,
-            fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-            color: isActive ? primaryColor : onSurfaceVariant,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // --- KHỐI 2: PACKAGE & GARMENT LIST CARD ---
-  Widget _buildPackageAndGarmentsCard() {
+  // --- WIDGET 3: THẺ DỊCH VỤ CHÍNH ---
+  Widget _buildMainServiceCard() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -352,7 +344,170 @@ class OrderTrackingScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: surfaceContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.local_laundry_service, size: 14, color: primaryColor),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Giặt Sấy Tinh Tươm • 5.0 kg',
+                            style: GoogleFonts.plusJakartaSans(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: primaryColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Quy Trình Tiêu Chuẩn 3T',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Khử trùng UV 99.9% & Giữ nếp vải cao cấp',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 11,
+                        color: onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 10),
+              Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      'https://lh3.googleusercontent.com/aida/AEtjO1UlqQ5xc-vncnLPPs4bDmAB4aR59j2eMOgGfcaif8aFTX_LyrNL8HTnJmRJ7XyCPcBEB6srSbZ4ste2Pmp--vn4PWKVBTl5fsJrSjQlv1sgz3cIh3gghBMppjOBcXDm-YlbN23YCYiF1Di4PIMUqwjy6A3_6nGJ54rBWblQ6uoMLHfn4ohwgDMtJRx3g3k8gPjllVeY6_CeJz7R1myQ_2PZPZX7iJcLEhBfmxtrKyYUQkLjj6p3mEKuEzZl',
+                      width: 72,
+                      height: 72,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        width: 72,
+                        height: 72,
+                        color: surfaceContainer,
+                        child: const Icon(Icons.dry_cleaning, color: primaryColor),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 72,
+                    padding: const EdgeInsets.symmetric(vertical: 2),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.85),
+                      borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+                    ),
+                    child: Text(
+                      '5.0 KG',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 9,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              Expanded(
+                child: _buildFeaturePill(Icons.spa, 'Hoa ban mai', 'Lưu hương 72h', primaryColor),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildFeaturePill(Icons.iron, 'Ủi hơi nước', 'Chống nhăn sâu', primaryColor),
+              ),
+              const SizedBox(width: 6),
+              Expanded(
+                child: _buildFeaturePill(Icons.verified_user, '#SEAL-3T-8892', 'Khóa an toàn', tertiaryColor),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeaturePill(IconData icon, String title, String sub, Color iconColor) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: surfaceLow,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 18, color: iconColor),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: onSurface,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            sub,
+            style: GoogleFonts.plusJakartaSans(
+              fontSize: 9,
+              color: iconColor == tertiaryColor ? tertiaryColor : onSurfaceVariant,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- WIDGET 4: CHI TIẾT ĐỒ GỬI GIẶT ---
+  Widget _buildGarmentsDetailCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -361,202 +516,105 @@ class OrderTrackingScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tiêu đề gói
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.local_laundry_service, color: primaryColor, size: 20),
-                  const SizedBox(width: 8),
                   Text(
-                    'Gói Giặt sấy Tinh Tươm 3T',
+                    'Chi Tiết Đồ Gửi Giặt',
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
+                      fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Phân loại & kiểm tra theo tiêu chuẩn 3T',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: onSurfaceVariant,
                     ),
                   ),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
+                  color: surfaceContainer,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  'Ước tính 5.0 kg',
+                  'Tổng: 12 món • 5.0 kg',
                   style: GoogleFonts.plusJakartaSans(
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          // Quy đổi món
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: surfaceLow,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: surfaceHigh),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.scale, color: primaryColor, size: 16),
-                    const SizedBox(width: 6),
-                    RichText(
-                      text: TextSpan(
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 12,
-                          color: onSurfaceVariant,
-                        ),
-                        children: [
-                          const TextSpan(text: 'Quy đổi: '),
-                          TextSpan(
-                            text: '~15–18 món quần áo',
-                            style: GoogleFonts.plusJakartaSans(
-                              fontWeight: FontWeight.bold,
-                              color: onSurface,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                Text(
-                  '25.000đ/kg',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                     color: primaryColor,
                   ),
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-
-          // 🚀 GIỮ NGUYÊN DANH SÁCH MÓN ĐỒ TỪ CODE CŨ (4 MỤC • 7 MÓN)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'DANH SÁCH ĐỒ GỬI (4 MỤC • 7 MÓN)',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: outlineColor,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              Text(
-                'Đã kiểm KCS',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
-                ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
-          _buildGarmentItem(
+          _buildGarmentRowItem(
             icon: Icons.dry_cleaning,
-            title: 'Áo sơ mi công sở & áo thun',
-            desc: 'Giặt sấy diệt khuẩn & Là phẳng',
-            quantity: 'x3',
-          ),
-          const SizedBox(height: 6),
-          _buildGarmentItem(
-            icon: Icons.straighten,
-            title: 'Quần tây âu & quần jean',
-            desc: 'Giặt hấp giữ nếp, khử khuẩn UV',
-            quantity: 'x2',
-          ),
-          const SizedBox(height: 6),
-          _buildGarmentItem(
-            icon: Icons.layers,
-            title: 'Áo khoác gió lót lụa',
-            desc: 'Giặt khô nhẹ tay, chống thấm',
-            quantity: 'x1',
-          ),
-          const SizedBox(height: 6),
-          _buildGarmentItem(
-            icon: Icons.checkroom,
-            title: 'Đầm lụa hồng pastel',
-            desc: 'Giặt tay chuyên sâu, ủi hơi nước',
-            quantity: 'x1',
-            isHighlight: true,
-          ),
-          const SizedBox(height: 12),
-
-          // Dịch vụ kèm theo
-          Text(
-            'DỊCH VỤ KÈM THEO & BỔ SUNG',
-            style: GoogleFonts.plusJakartaSans(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: outlineColor,
-              letterSpacing: 0.5,
-            ),
+            title: 'Áo sơ mi & Áo thun',
+            sub: 'Giặt sấy & Ủi hơi nước',
+            count: '5 cái',
           ),
           const SizedBox(height: 8),
 
-          _buildPerkRow(
-            icon: Icons.local_florist,
-            title: 'Hương hoa ban mai cao cấp',
-            subtitle: 'Tinh dầu thơm dịu lưu hương 48h',
-            tag: 'Miễn phí 0đ',
+          _buildGarmentRowItem(
+            icon: Icons.checkroom,
+            title: 'Quần tây & Quần jean',
+            sub: 'Giặt sấy & Ủi tạo nếp',
+            count: '3 cái',
           ),
-          const SizedBox(height: 6),
-          _buildPerkRow(
-            icon: Icons.verified,
-            title: 'Túi vải niêm phong chống nước 3T',
-            subtitle: 'Bảo mật seal mã QR một chiều',
-            tag: 'Miễn phí 0đ',
+          const SizedBox(height: 8),
+
+          // Đã sửa icon thành Icons.style chuẩn SDK Flutter
+          _buildGarmentRowItem(
+            icon: Icons.style,
+            title: 'Đầm công sở / Váy vải lụa',
+            sub: 'Giặt sấy nhiệt dịu',
+            count: '2 cái',
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
+
+          _buildGarmentRowItem(
+            icon: Icons.soap,
+            title: 'Khăn tắm & Đồ cotton',
+            sub: 'Khử khuẩn UV & Xịt thơm',
+            count: '2 cái',
+          ),
+          const SizedBox(height: 12),
+
           Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: primaryColor.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: primaryColor.withOpacity(0.2)),
+            padding: const EdgeInsets.only(top: 8),
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: outlineVariant,
+                  width: 1,
+                  style: BorderStyle.solid,
+                ),
+              ),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.check_circle, color: primaryColor, size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Cân đo thực tế tại xưởng 3T',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: onSurface,
-                      ),
+                const Icon(Icons.verified, size: 16, color: tertiaryColor),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Đã kiểm đếm & bấm mã Seal niêm phong trước mặt khách',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: tertiaryColor,
                     ),
-                  ],
-                ),
-                Text(
-                  '5.0 kg (Chuẩn khớp)',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: primaryColor,
                   ),
                 ),
               ],
@@ -567,19 +625,17 @@ class OrderTrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGarmentItem({
+  Widget _buildGarmentRowItem({
     required IconData icon,
     required String title,
-    required String desc,
-    required String quantity,
-    bool isHighlight = false,
+    required String sub,
+    required String count,
   }) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         color: surfaceLow,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: surfaceHigh),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -587,35 +643,31 @@ class OrderTrackingScreen extends StatelessWidget {
           Row(
             children: [
               Container(
-                width: 28,
-                height: 28,
-                decoration: const BoxDecoration(
-                  color: surfaceContainer,
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: primaryFixed.withOpacity(0.5),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  size: 16,
-                  color: isHighlight ? secondaryColor : primaryColor,
-                ),
+                child: Icon(icon, size: 18, color: primaryColor),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
                     style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: onSurface,
                     ),
                   ),
                   Text(
-                    desc,
+                    sub,
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 10,
-                      color: outlineColor,
+                      color: onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -623,17 +675,17 @@ class OrderTrackingScreen extends StatelessWidget {
             ],
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
             decoration: BoxDecoration(
-              color: surfaceHigh,
-              borderRadius: BorderRadius.circular(6),
+              color: surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
-              quantity,
+              count,
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
-                color: isHighlight ? secondaryColor : primaryColor,
+                color: onSurface,
               ),
             ),
           ),
@@ -642,29 +694,207 @@ class OrderTrackingScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPerkRow({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String tag,
-  }) {
+  // --- WIDGET 5: TIMELINE 5 GIAI ĐOẠN ---
+  Widget _buildTimelineSection() {
+    final bool isDelivering = widget.orderStatus == 'delivering';
+
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: surfaceContainer,
-        borderRadius: BorderRadius.circular(8),
+        color: cardBg,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Dòng Thời Gian Xử Lý',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: onSurface,
+                    ),
+                  ),
+                  Text(
+                    'Cập nhật tức thời theo cảm biến máy & Shipper',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: primaryFixed,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isDelivering ? 'Giai đoạn 5/5' : 'Giai đoạn 3/5',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          Stack(
+            children: [
+              // Line base
+              Positioned(
+                left: 11,
+                top: 12,
+                bottom: 12,
+                child: Container(
+                  width: 2,
+                  color: surfaceVariant,
+                ),
+              ),
+              // Line overlay
+              Positioned(
+                left: 11,
+                top: 12,
+                height: isDelivering ? 320 : 215,
+                child: Container(
+                  width: 2,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [primaryColor, primaryContainer],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ),
+
+              Column(
+                children: [
+                  // Stage 1
+                  _buildTimelineNode(
+                    icon: Icons.check,
+                    isFinished: true,
+                    title: 'Đã tiếp nhận đơn hàng',
+                    time: '10:15',
+                    desc: 'Cân điện tử xác nhận 5.0 kg tại sảnh Heritage Manor.',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Stage 2
+                  _buildTimelineNode(
+                    icon: Icons.check,
+                    isFinished: true,
+                    title: 'Shipper đã nhận & Khóa seal',
+                    time: '11:05',
+                    desc: 'Mã seal bảo mật #SEAL-3T-8892 được bấm chốt nguyên vẹn.',
+                    badge: '#SEAL-3T-8892',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Stage 3
+                  if (isDelivering)
+                    _buildTimelineNode(
+                      icon: Icons.check,
+                      isFinished: true,
+                      title: 'Giặt sấy & Khử khuẩn UV 99.9%',
+                      time: '14:30',
+                      desc: 'Lồng giặt riêng M-08 sấy nhiệt dịu 55°C + hương hoa ban mai.',
+                    )
+                  else
+                    _buildTimelineActiveNode(),
+                  const SizedBox(height: 16),
+
+                  // Stage 4
+                  _buildTimelineNode(
+                    icon: isDelivering ? Icons.check : Icons.inventory_2,
+                    isFinished: isDelivering,
+                    isUpcoming: !isDelivering,
+                    title: 'Đóng gói chống thấm & Niêm phong',
+                    time: isDelivering ? '15:15' : 'Sắp tới • 15:45',
+                    desc: 'Gấp nếp tinh tươm vào túi vải chuyên dụng 3T kháng bụi nước.',
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Stage 5
+                  if (isDelivering)
+                    _buildTimelineActiveDeliveryNode()
+                  else
+                    _buildTimelineNode(
+                      icon: Icons.local_shipping,
+                      isUpcoming: true,
+                      title: 'Đang giao hàng tận cửa',
+                      time: 'Dự kiến • 16:30',
+                      desc: 'Kiểm tra tem niêm phong seal bảo mật #SEAL-3T-8892 trước khi nhận.',
+                    ),
+                ],
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineNode({
+    required IconData icon,
+    bool isFinished = false,
+    bool isUpcoming = false,
+    required String title,
+    required String time,
+    required String desc,
+    String? badge,
+  }) {
+    return Opacity(
+      opacity: isUpcoming ? 0.6 : 1.0,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: isFinished
+                  ? primaryColor
+                  : (isUpcoming ? surfaceVariant : primaryFixed),
+              shape: BoxShape.circle,
+              border: Border.all(color: cardBg, width: 2),
+            ),
+            child: Icon(
+              icon,
+              size: 13,
+              color: isFinished ? Colors.white : onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(width: 12),
           Expanded(
-            child: Row(
-              children: [
-                Icon(icon, color: primaryColor, size: 18),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+            child: Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: surfaceLow,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         title,
@@ -673,10 +903,9 @@ class OrderTrackingScreen extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: onSurface,
                         ),
-                        overflow: TextOverflow.ellipsis,
                       ),
                       Text(
-                        subtitle,
+                        time,
                         style: GoogleFonts.plusJakartaSans(
                           fontSize: 10,
                           color: onSurfaceVariant,
@@ -684,474 +913,363 @@ class OrderTrackingScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 2),
+                  RichText(
+                    text: TextSpan(
+                      style: GoogleFonts.plusJakartaSans(fontSize: 11, color: onSurfaceVariant),
+                      children: [
+                        TextSpan(text: desc),
+                        if (badge != null) ...[
+                          const WidgetSpan(child: SizedBox(width: 4)),
+                          WidgetSpan(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: primaryFixed,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                badge,
+                                style: GoogleFonts.plusJakartaSans(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: primaryColor,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineActiveNode() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FadeTransition(
+          opacity: _pulseController,
+          child: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: primaryColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: primaryFixed, width: 3),
+              boxShadow: [
+                BoxShadow(color: primaryColor.withOpacity(0.3), blurRadius: 6),
               ],
             ),
+            child: const Icon(Icons.sync, size: 14, color: Colors.white),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: cardBg,
+              color: primaryFixed.withOpacity(0.3),
               borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(
-              tag,
-              style: GoogleFonts.plusJakartaSans(
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                color: primaryColor,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- KHỐI 3: DELIVERY & SCHEDULE CARD ---
-  Widget _buildDeliveryScheduleCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.location_on, color: primaryColor, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Địa chỉ & Lịch hẹn',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: onSurface,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: surfaceContainer,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Giao nhận tận cửa',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: surfaceHigh),
-          const SizedBox(height: 12),
-
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Icon(Icons.person, size: 16, color: outlineColor),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Chị Kiều Như • 0988 ••• 321',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'P.14.02, Tháp B – Chung cư Sunrise City, Đường Nguyễn Hữu Thọ, P. Tân Hưng, Q.7, TP.HCM',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontSize: 12,
-                        color: onSurfaceVariant,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-
-          Row(
-            children: [
-              const Icon(Icons.two_wheeler, size: 16, color: primaryColor),
-              const SizedBox(width: 8),
-              RichText(
-                text: TextSpan(
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    color: onSurfaceVariant,
-                  ),
-                  children: [
-                    const TextSpan(text: 'Đang giao hàng: '),
-                    TextSpan(
-                      text: 'Dự kiến đến trong 15–20 phút',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-
-          Row(
-            children: [
-              const Icon(Icons.event_available, size: 16, color: outlineColor),
-              const SizedBox(width: 8),
-              RichText(
-                text: TextSpan(
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 12,
-                    color: onSurfaceVariant,
-                  ),
-                  children: [
-                    const TextSpan(text: 'Thời gian giao trả: '),
-                    TextSpan(
-                      text: 'Trước 12:00 trưa mai',
-                      style: GoogleFonts.plusJakartaSans(
-                        fontWeight: FontWeight.bold,
-                        color: onSurface,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- KHỐI 4: PAYMENT & BILLING CARD ---
-  Widget _buildPaymentCard() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.receipt_long, color: primaryColor, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Chi tiết thanh toán',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: onSurface,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                decoration: BoxDecoration(
-                  color: primaryColor.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Đã cân thực tế: 5.0 kg',
-                  style: GoogleFonts.plusJakartaSans(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: surfaceHigh),
-          const SizedBox(height: 12),
-
-          _buildBillingRow('Gói giặt sấy thực tế (5.0 kg x 25.000đ)', '125.000 đ'),
-          const SizedBox(height: 6),
-          _buildBillingRow('Hương hoa ban mai & Túi niêm phong', '0 đ (Miễn phí)', isFree: true),
-          const SizedBox(height: 6),
-          _buildBillingRow('Phí vận chuyển 2 chiều', 'Miễn phí', isFree: true),
-          const SizedBox(height: 6),
-          _buildBillingRow('Voucher ưu đãi (WASH3TNEW)', '-20.000 đ', isDiscount: true),
-          const SizedBox(height: 10),
-          const Divider(height: 1, color: surfaceHigh),
-          const SizedBox(height: 10),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'TỔNG THANH TOÁN',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: onSurface,
-                    ),
-                  ),
-                  Text(
-                    'Thanh toán khi nhận đồ sạch',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 11,
-                      color: outlineColor,
-                    ),
-                  ),
-                ],
-              ),
-              Text(
-                '105.000 đ',
-                style: GoogleFonts.plusJakartaSans(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: primaryColor,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Mã Seal túi
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: surfaceLow,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: surfaceHigh),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.verified, size: 16, color: primaryColor),
-                    const SizedBox(width: 6),
                     Text(
-                      'Mã Seal túi: #SEAL-3T-8892 (Nguyên vẹn)',
+                      'Giặt sấy & Khử khuẩn UV 99.9%',
                       style: GoogleFonts.plusJakartaSans(
                         fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: onSurface,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '70% Xong',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 2),
+                const SizedBox(height: 6),
                 Text(
-                  '* Bạn kiểm tra seal niêm phong cùng Shipper trước khi nhận đồ và thanh toán.',
+                  'Lồng giặt số M-08 đang chạy sấy nhiệt dịu 55°C chống nhăn + xịt vi hạt hương hoa ban mai.',
                   style: GoogleFonts.plusJakartaSans(
-                    fontSize: 10,
-                    fontStyle: FontStyle.italic,
+                    fontSize: 11,
                     color: onSurfaceVariant,
+                    height: 1.3,
                   ),
                 ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+                const SizedBox(height: 8),
 
-  Widget _buildBillingRow(String label, String value, {bool isFree = false, bool isDiscount = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 12,
-            color: onSurfaceVariant,
-          ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.plusJakartaSans(
-            fontSize: 12,
-            fontWeight: isFree || isDiscount ? FontWeight.w600 : FontWeight.normal,
-            color: isFree || isDiscount ? primaryColor : onSurface,
-          ),
-        ),
-      ],
-    );
-  }
-
-  // --- 🚀 STICKY BOTTOM ACTIONS BAR (GIỮ NGUYÊN LUỒNG ĐIỀU KIỆN XÁC NHẬN) ---
-  Widget _buildStickyBottomActionBar(BuildContext context) {
-    final bool canConfirm = orderStatus == 'delivering';
-
-    return Positioned(
-      left: 0,
-      right: 0,
-      bottom: 0,
-      child: Container(
-        padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 20),
-        decoration: BoxDecoration(
-          color: bgSurface.withOpacity(0.95),
-          boxShadow: [
-            BoxShadow(
-              color: primaryColor.withOpacity(0.08),
-              blurRadius: 16,
-              offset: const Offset(0, -4),
-            ),
-          ],
-          border: const Border(top: BorderSide(color: surfaceContainer)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // 🚀 Nút hành động chính: Kiểm tra điều kiện canConfirm
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (canConfirm) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ConfirmReceiptScreen(),
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Row(
-                            children: [
-                              const Icon(Icons.info_outline, color: Colors.white, size: 18),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  'Đơn hàng đang xử lý/giặt sấy. Bạn chỉ có thể xác nhận khi Shipper bắt đầu giao đồ!',
-                                  style: GoogleFonts.plusJakartaSans(fontSize: 12),
-                                ),
-                              ),
-                            ],
-                          ),
-                          backgroundColor: const Color(0xFF512128),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        ),
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: canConfirm ? primaryColor : Colors.grey.shade400,
-                    elevation: canConfirm ? 4 : 0,
-                    shadowColor: primaryColor.withOpacity(0.25),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: cardBg.withOpacity(0.9),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
                         children: [
-                          Icon(
-                            canConfirm ? Icons.verified : Icons.lock_clock,
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(width: 8),
+                          const Icon(Icons.shield_outlined, size: 16, color: tertiaryColor),
+                          const SizedBox(width: 6),
                           Text(
-                            canConfirm ? 'Xác nhận đã nhận hàng' : 'Chờ giao hàng để xác nhận',
+                            'Lồng giặt riêng biệt 1 máy / 1 khách',
                             style: GoogleFonts.plusJakartaSans(
-                              fontSize: 14,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: onSurface,
                             ),
                           ),
                         ],
                       ),
-                      Icon(
-                        canConfirm ? Icons.arrow_forward : Icons.info_outline,
-                        size: 20,
-                        color: Colors.white,
+                      Text(
+                        'An tâm 100%',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: tertiaryColor,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
 
-              // Nút phụ: Hotline CSKH
-              SizedBox(
-                width: double.infinity,
-                height: 40,
-                child: TextButton.icon(
-                  onPressed: () => _showActionDialog(
-                    context,
-                    'Tổng đài CSKH WashSmart 3T',
-                    'Đang kết nối tới hotline hỗ trợ: 1900 3388 (Miễn phí 24/7)',
-                  ),
-                  style: TextButton.styleFrom(
-                    backgroundColor: surfaceContainer,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                  icon: const Icon(Icons.support_agent, size: 18, color: primaryColor),
-                  label: Text(
-                    'Hotline hỗ trợ: 1900 3388',
-                    style: GoogleFonts.plusJakartaSans(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: Container(
+                    height: 6,
+                    color: surfaceVariant,
+                    child: Row(
+                      children: [
+                        Expanded(flex: 70, child: Container(color: primaryColor)),
+                        Expanded(flex: 30, child: Container(color: Colors.transparent)),
+                      ],
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
+      ],
+    );
+  }
+
+  Widget _buildTimelineActiveDeliveryNode() {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        FadeTransition(
+          opacity: _pulseController,
+          child: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: primaryColor,
+              shape: BoxShape.circle,
+              border: Border.all(color: primaryFixed, width: 3),
+              boxShadow: [
+                BoxShadow(color: primaryColor.withOpacity(0.3), blurRadius: 6),
+              ],
+            ),
+            child: const Icon(Icons.two_wheeler, size: 14, color: Colors.white),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: primaryFixed.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Đang giao hàng tận cửa',
+                      style: GoogleFonts.plusJakartaSans(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: primaryColor,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: primaryColor,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        'Đến trong ~15 phút',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Shipper đang di chuyển tới sảnh Heritage Manor. Vui lòng kiểm tra tem seal #SEAL-3T-8892.',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 11,
+                    color: onSurfaceVariant,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // --- WIDGET 6: NÚT HÀNH ĐỘNG VỚI LUỒNG CHUYỂN MÀN HÌNH ---
+  Widget _buildBottomActions(BuildContext context) {
+    final bool canConfirm = widget.orderStatus == 'delivering';
+
+    return Column(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: 56,
+          child: ElevatedButton(
+            onPressed: () {
+              // 🚀 LUỒNG CHUYỂN MÀN HÌNH: Kiểm tra trạng thái đơn hàng
+              if (canConfirm) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ConfirmReceiptScreen(),
+                  ),
+                );
+              } else {
+                // Nếu chưa tới bước giao hàng thì báo SnackBar
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Row(
+                      children: [
+                        const Icon(Icons.info_outline, color: Colors.white, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Đơn hàng đang giặt sấy. Bạn chỉ có thể xác nhận khi Shipper bắt đầu giao đồ!',
+                            style: GoogleFonts.plusJakartaSans(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                    backgroundColor: const Color(0xFF512128),
+                    behavior: SnackBarBehavior.floating,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+              elevation: 4,
+              shadowColor: primaryColor.withOpacity(0.3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(28),
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'Đã nhận được hàng',
+                  style: GoogleFonts.plusJakartaSans(
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                const Icon(Icons.check_circle, size: 20),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            InkWell(
+              onTap: () => _showActionDialog(
+                context,
+                'Khiếu nại sự cố đồ giặt',
+                'Hệ thống tiếp nhận phản hồi & chuyên viên CSKH 3T sẽ liên hệ bạn trong 15 phút.',
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.report_problem_outlined, size: 14, color: primaryColor),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Khiếu nại sự cố đồ giặt',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: primaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Text('•', style: TextStyle(color: outlineVariant)),
+            ),
+            InkWell(
+              onTap: () => _showToast('Đang tải hóa đơn điện tử...'),
+              child: Row(
+                children: [
+                  const Icon(Icons.receipt_long, size: 14, color: onSurfaceVariant),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Xem hóa đơn điện tử',
+                    style: GoogleFonts.plusJakartaSans(
+                      fontSize: 11,
+                      color: onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
