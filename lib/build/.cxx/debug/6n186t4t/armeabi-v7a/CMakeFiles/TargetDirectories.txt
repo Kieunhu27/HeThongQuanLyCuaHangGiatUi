@@ -1,2 +1,0 @@
-C:/Users/KIEU NHU/HeThongQuanLyCuaHangGiatUi/smartwash/build/.cxx/debug/6n186t4t/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/Users/KIEU NHU/HeThongQuanLyCuaHangGiatUi/smartwash/build/.cxx/debug/6n186t4t/armeabi-v7a/CMakeFiles/rebuild_cache.dir
